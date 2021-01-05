@@ -1,0 +1,3 @@
+[submodule "jtframe"]
+	path = jtframe
+	url = https://github.com/jotego/jtframe.git
