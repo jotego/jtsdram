@@ -36,8 +36,8 @@ module jtsdram_prog(
     input             prog_rdy
 );
 
-reg [24:0] full_addr;
-reg        half;
+reg  [24:0] full_addr;
+wire        half;
 
 assign prog_rd = 0;
 

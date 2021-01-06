@@ -97,8 +97,8 @@ wire LHBL, LVBL, bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
 assign blue = 4'd0;
-assign green = {4{~bad}};
-assign red   = {4{bad}};
+assign green = (LHBL && LVBL) ? {4{~bad}} : 4'd0;
+assign red   = (LHBL && LVBL) ? {4{bad}}  : 4'd0;
 
 jtsdram_snd u_snd(
     .clk        ( clk           ),

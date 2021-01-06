@@ -1,0 +1,10 @@
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_game.v     ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_bank.v     ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_checker.v  ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_prog.v     ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_seq.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_shuffle.v  ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_snd.v      ]
+
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ../modules/jtframe/hdl/clocking/jtframe_cen48.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ../modules/jtframe/hdl/video/jtframe_vtimer.v        ]
