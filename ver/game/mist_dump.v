@@ -51,7 +51,7 @@ module mist_dump(
             $shm_probe(UUT.u_game,"A");
             $shm_probe(UUT.u_game.u_snd,"AS");
             $shm_probe(UUT.u_game.u_checker,"AS");
-            $shm_probe(UUT.u_frame.u_board.u_sdram,"AS");
+            // $shm_probe(UUT.u_frame.u_board.u_sdram,"AS");
         `endif
     end
 `endif

@@ -65,7 +65,7 @@ always @(posedge clk or posedge rst) begin
             end
             2'b10: begin
                 prog_start <= 0;
-                if( prog_done ) begin
+                if( !prog_start && prog_done ) begin
                     prog_wait <= 0;
                     rd_start  <= 1;
                     rd_wait   <= 1;
