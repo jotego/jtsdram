@@ -35,14 +35,16 @@ module jtsdram_prog(
     output reg        prog_we,
     output            prog_rd,
     input             prog_ack,
-    input             prog_rdy
+    input             prog_rdy,
+    output            rfsh
 );
 
 reg  [24:0] full_addr;
-reg         half, wait_rdy, rfsh, last_LVBL;
+reg         half, wait_rdy, last_LVBL, rfsh_frame;
 
 assign prog_mask = { half, ~half } | {2{done}};
 assign prog_rd = 0;
+assign rfsh = rfsh_frame & ~LVBL;
 
 always @(posedge clk or posedge rst) begin
     if(rst) begin
@@ -55,7 +57,7 @@ always @(posedge clk or posedge rst) begin
         prog_addr  <= 22'd0;
         prog_ba    <= 2'd0;
         wait_rdy   <= 0;
-        rfsh       <= 0;
+        rfsh_frame <= 0;
     end else begin
         if( start ) begin
             dwnld_busy <= 1;
@@ -63,23 +65,19 @@ always @(posedge clk or posedge rst) begin
             full_addr  <= 25'd0;
             wait_rdy   <= 0;
         end else begin
+            last_LVBL <= LVBL;
+            if( LVBL && !last_LVBL ) rfsh_frame <= ~rfsh_frame;
             if( !done && !wait_rdy ) begin
-                last_LVBL <= LVBL;
-                if( LVBL && !last_LVBL ) rfsh <= ~rfsh;
-                if( LVBL || !rfsh ) begin
-                    case( full_addr[2:1] )
-                        2'd0: prog_data <= ba0_data;
-                        2'd1: prog_data <= ba1_data;
-                        2'd2: prog_data <= ba2_data;
-                        2'd3: prog_data <= ba3_data;
-                    endcase // prog_ba
-                    { prog_ba, prog_addr, half } <= full_addr;
-                    prog_we   <= 1;
-                    wait_rdy  <= 1;
-                    dwnld_busy <= 1;
-                end else begin
-                    dwnld_busy <= 0;
-                end
+                case( full_addr[2:1] )
+                    2'd0: prog_data <= ba0_data;
+                    2'd1: prog_data <= ba1_data;
+                    2'd2: prog_data <= ba2_data;
+                    2'd3: prog_data <= ba3_data;
+                endcase // prog_ba
+                { prog_ba, prog_addr, half } <= full_addr;
+                prog_we   <= 1;
+                wait_rdy  <= 1;
+                dwnld_busy <= 1;
             end
             if( prog_ack ) begin
                 prog_we  <= 0;

@@ -72,10 +72,10 @@ wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr;
 wire [15:0] ba0_data_ref, ba1_data_ref, ba2_data_ref, ba3_data_ref, data_ref;
 wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 
-wire        prog_start, prog_done, rd_start,
+wire        prog_start, prog_done, rd_start, prog_rfsh,
             ba0_done, ba1_done, ba2_done, ba3_done;
 
-assign refresh_en = ~LVBL & ~dwnld_busy;
+assign refresh_en = dwnld_busy ? prog_rfsh : ~LVBL;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 
 // Bank 0 writting not used for now
@@ -111,6 +111,7 @@ jtsdram_prog u_prog(
     .done       ( prog_done     ),
     .dwnld_busy ( dwnld_busy    ),
     .LVBL       ( LVBL          ),
+    .rfsh       ( prog_rfsh     ),
 
     .ba0_data   ( ba0_data_ref  ),
     .ba1_data   ( ba1_data_ref  ),
