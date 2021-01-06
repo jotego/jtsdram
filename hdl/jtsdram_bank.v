@@ -34,7 +34,7 @@ always @(posedge clk, posedge rst) begin
     if( rst ) begin
         addr <= 22'd0;
         bad  <= 0;
-        done <= 1;
+        done <= 0;
     end else begin
         if(start) begin
             addr <= 22'd0;

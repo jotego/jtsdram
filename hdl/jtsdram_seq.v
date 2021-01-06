@@ -73,7 +73,7 @@ always @(posedge clk or posedge rst) begin
             end
             2'b01: begin
                 rd_start <= 0;
-                if( ba0_done && ba1_done && ba2_done && ba3_done ) begin
+                if( !rd_start && ba0_done && ba1_done && ba2_done && ba3_done ) begin
                     rd_wait <= 0;
                     // advance lfsr
                     lfsr <= { lfsr_fb, lfsr[15:1] };
