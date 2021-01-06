@@ -29,12 +29,10 @@ module jtsdram_game(
     output          HS,
     output          VS,
     // cabinet I/O
-    input   [ 3:0]  start_button,
-    input   [ 3:0]  coin_input,
-    input   [ 9:0]  joystick1,
-    input   [ 9:0]  joystick2,
-    input   [ 9:0]  joystick3,
-    input   [ 9:0]  joystick4,
+    input   [ 1:0]  start_button,
+    input   [ 1:0]  coin_input,
+    input   [ 5:0]  joystick1,
+    input   [ 5:0]  joystick2,
     // SDRAM interface
     input           downloading,
     output          dwnld_busy,
@@ -73,8 +71,6 @@ module jtsdram_game(
     input   [24:0]  ioctl_addr,
     input   [ 7:0]  ioctl_data,
     input           ioctl_wr,
-    output  [ 7:0]  ioctl_data2sd,
-    input           ioctl_ram, // 0 - ROM, 1 - RAM(EEPROM)
     output  [21:0]  prog_addr,
     output  [15:0]  prog_data,
     output  [ 1:0]  prog_mask,
@@ -156,7 +152,7 @@ u_timer(
     .VS         ( VS            )
 );
 
-jtsdram_checker u_sdram (
+jtsdram_checker u_checker(
     .rst         ( rst           ),
     .clk         ( clk           ),
     .LVBL        ( LVBL          ),

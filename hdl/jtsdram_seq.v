@@ -25,6 +25,8 @@ module jtsdram_seq(
     output     [4:0] ba2_key,
     output     [4:0] ba3_key,
 
+    output reg [15:0] data_ref,
+
     output reg       prog_start,
     input            prog_done,
 
@@ -54,6 +56,7 @@ always @(posedge clk or posedge rst) begin
         prog_wait  <= 0;
         rd_wait    <= 0;
         lfsr       <= 16'haaaa;
+        data_ref   <= 16'haaaa;
     end else begin
         case( {prog_wait, rd_wait} )
             2'b00: begin
@@ -74,6 +77,7 @@ always @(posedge clk or posedge rst) begin
                     rd_wait <= 0;
                     // advance lfsr
                     lfsr <= { lfsr_fb, lfsr[15:1] };
+                    data_ref <= data_ref+1'b1;
                 end
             end
             default: begin

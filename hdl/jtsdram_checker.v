@@ -88,6 +88,7 @@ jtsdram_seq u_seq(
     .ba1_key    ( ba1_key       ),
     .ba2_key    ( ba2_key       ),
     .ba3_key    ( ba3_key       ),
+    .data_ref   ( data_ref      ),
 
     .prog_start ( prog_start    ),
     .prog_done  ( prog_done     ),
