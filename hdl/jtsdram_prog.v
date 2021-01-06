@@ -27,49 +27,56 @@ module jtsdram_prog(
     input      [15:0] ba1_data,
     input      [15:0] ba2_data,
     input      [15:0] ba3_data,
-    output     [21:0] prog_addr,
+    output reg [21:0] prog_addr,
     output reg [15:0] prog_data,
-    output reg [ 1:0] prog_mask,
-    output     [ 1:0] prog_ba,
+    output     [ 1:0] prog_mask,
+    output reg [ 1:0] prog_ba,
     output reg        prog_we,
     output            prog_rd,
+    input             prog_ack,
     input             prog_rdy
 );
 
 reg  [24:0] full_addr;
-wire        half;
+reg         half, wait_rdy;
 
+assign prog_mask = { half, ~half } | {2{done}};
 assign prog_rd = 0;
-
-assign { prog_ba, prog_addr, half } = full_addr;
 
 always @(posedge clk or posedge rst) begin
     if(rst) begin
         done       <= 0;
         dwnld_busy <= 0;
         full_addr  <= 25'd0;
-        prog_mask  <= 2'd0;
         prog_we    <= 1'd0;
         prog_data  <= 16'd0;
-        prog_mask  <= 2'b11;
+        half       <= 0;
+        prog_addr  <= 22'd0;
+        prog_ba    <= 2'd0;
+        wait_rdy   <= 0;
     end else begin
         if( start ) begin
             dwnld_busy <= 1;
             done       <= 0;
             full_addr  <= 25'd0;
+            wait_rdy   <= 0;
         end else begin
-            if( !done && !prog_we ) begin
+            if( !done && !wait_rdy ) begin
                 case( prog_ba )
                     2'd0: prog_data <= ba0_data;
                     2'd1: prog_data <= ba1_data;
                     2'd2: prog_data <= ba2_data;
                     2'd3: prog_data <= ba3_data;
                 endcase // prog_ba
-                prog_mask <= { half, ~half };
+                { prog_ba, prog_addr, half } <= full_addr;
                 prog_we   <= 1;
+                wait_rdy  <= 1;
             end
+            if( prog_ack ) begin
+                prog_we  <= 0;
+            end else
             if( prog_rdy ) begin
-                prog_we   <= 0;
+                wait_rdy  <= 0;
                 full_addr <= full_addr + 1'd1;
                 if( &full_addr ) begin
                     done       <= 1;

@@ -78,6 +78,7 @@ module jtsdram_game(
     output          prog_we,
     output          prog_rd,
     input           prog_rdy,
+    input           prog_ack,
     // DIP switches
     input   [31:0]  status,     // only bits 31:16 are looked at
     input           dip_pause,
@@ -167,6 +168,7 @@ jtsdram_checker u_checker(
     .prog_we     ( prog_we       ),
     .prog_rd     ( prog_rd       ),
     .prog_rdy    ( prog_rdy      ),
+    .prog_ack    ( prog_ack      ),
 
     // Bank 0: allows R/W
     .ba0_addr    ( ba0_addr      ),

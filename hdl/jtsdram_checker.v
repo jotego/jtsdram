@@ -31,6 +31,7 @@ module jtsdram_checker(
     output          prog_we,
     output          prog_rd,
     input           prog_rdy,
+    input           prog_ack,
 
     // Bank 0: allows R/W
     output   [21:0] ba0_addr,
@@ -119,6 +120,7 @@ jtsdram_prog u_prog(
     .prog_ba    ( prog_ba       ),
     .prog_we    ( prog_we       ),
     .prog_rd    ( prog_rd       ),
+    .prog_ack   ( prog_ack      ),
     .prog_rdy   ( prog_rdy      )
 );
 
