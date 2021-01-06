@@ -23,6 +23,10 @@ module jtsdram_checker(
 
     output          dwnld_busy,
     output          bad,
+    output          ba0_bad,
+    output          ba1_bad,
+    output          ba2_bad,
+    output          ba3_bad,
 
     output  [21:0]  prog_addr,
     output  [15:0]  prog_data,
@@ -70,8 +74,6 @@ wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 
 wire        prog_start, prog_done, rd_start,
             ba0_done, ba1_done, ba2_done, ba3_done;
-
-wire        ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign refresh_en = ~LVBL;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;

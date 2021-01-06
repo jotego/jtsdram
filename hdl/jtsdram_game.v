@@ -95,11 +95,25 @@ module jtsdram_game(
 );
 
 wire LHBL, LVBL, bad;
+wire [7:0] vdump;
+wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
-assign blue = 4'd0;
-assign green = (LHBL && LVBL) ? {4{~bad}} : 4'd0;
-assign red   = (LHBL && LVBL) ? {4{bad}}  : 4'd0;
+
+jtsdram_video u_video(
+    .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
+    .LHBL       ( LHBL          ),
+    .vdump      ( vdump         ),
+    .dwnld_busy ( dwnld_busy    ),
+    .ba0_bad    ( ba0_bad       ),
+    .ba1_bad    ( ba1_bad       ),
+    .ba2_bad    ( ba2_bad       ),
+    .ba3_bad    ( ba3_bad       ),
+    .red        ( red           ),
+    .green      ( green         ),
+    .blue       ( blue          )
+);
 
 jtsdram_snd u_snd(
     .clk        ( clk           ),
@@ -141,7 +155,7 @@ jtframe_vtimer #(
 u_timer(
     .clk        ( clk           ),
     .pxl_cen    ( pxl_cen       ),
-    .vdump      (               ),
+    .vdump      ( vdump         ),
     .vrender    (               ),
     .vrender1   (               ),
     .H          (               ),
@@ -160,6 +174,10 @@ jtsdram_checker u_checker(
 
     .dwnld_busy  ( dwnld_busy    ),
     .bad         ( bad           ),
+    .ba0_bad     ( ba0_bad       ),
+    .ba1_bad     ( ba1_bad       ),
+    .ba2_bad     ( ba2_bad       ),
+    .ba3_bad     ( ba3_bad       ),
 
     .prog_addr   ( prog_addr     ),
     .prog_data   ( prog_data     ),

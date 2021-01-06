@@ -40,6 +40,7 @@ always @(posedge clk, posedge rst) begin
             addr <= 22'd0;
             rd   <= 1;
             done <= 0;
+            bad  <= 0;
         end else if(!done) begin
             if( ack ) begin
                 rd <= 0;
