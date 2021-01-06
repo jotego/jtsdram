@@ -31,26 +31,38 @@ module jtsdram_bank(
     output reg        done
 );
 
+reg dly_rd;
+
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        addr <= 22'd0;
-        bad  <= 0;
-        done <= 0;
+        addr   <= 22'd0;
+        bad    <= 0;
+        done   <= 0;
+        dly_rd <= 0;
     end else begin
         if(start) begin
             addr <= 22'd0;
             rd   <= 1;
             done <= 0;
             bad  <= 0;
-        end else if(!done && LVBL ) begin
+        end else if(!done) begin
+            if( dly_rd && LVBL ) begin
+                dly_rd <= 0;
+                rd     <= 1;
+            end
             if( ack ) begin
                 rd <= 0;
             end
             else if( rdy ) begin
                 if( &addr )
                     done <= 1;
-                else
-                    rd <= 1;
+                else begin
+                    if( LVBL ) begin
+                        rd     <= 1;
+                        dly_rd <= 0;
+                    end else
+                        dly_rd <= 1;
+                end
                 addr <= addr + 1'd1;
                 if( data_read != {2{data_ref}} ) bad <= 1;
             end
