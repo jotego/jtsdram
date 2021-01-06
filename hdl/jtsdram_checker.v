@@ -75,6 +75,11 @@ wire        ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 assign refresh_en = ~LVBL;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 
+// Bank 0 writting not used for now
+assign ba0_wr    = 0;
+assign ba0_din   = 16'd0;
+assign ba0_din_m = 2'b11;
+
 jtsdram_seq u_seq(
     .rst        ( rst           ),
     .clk        ( clk           ),

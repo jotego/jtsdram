@@ -16,14 +16,14 @@
     Version: 1.0
     Date: 5-1-2021 */
 
-module jtsdram(
+module jtsdram_game(
     input           rst,
     input           clk,      // 48   MHz
     output          pxl2_cen,   // 12   MHz
     output          pxl_cen,    //  6   MHz
-    output   [7:0]  red,
-    output   [7:0]  green,
-    output   [7:0]  blue,
+    output   [3:0]  red,
+    output   [3:0]  green,
+    output   [3:0]  blue,
     output          LHBL_dly,
     output          LVBL_dly,
     output          HS,
@@ -97,20 +97,26 @@ module jtsdram(
     input   [3:0]   gfx_en
 );
 
-wire        HB, VB;
+wire LHBL, LVBL, bad;
 
-assign LVBL         = ~VB;
-assign LHBL         = ~HB;
+assign LHBL_dly = LHBL, LVBL_dly=LVBL;
+assign blue = 4'd0;
+assign green = {4{~bad}};
+assign red   = {4{bad}};
 
-wire        cen16, cen12, cen8, cen10b;
+jtsdram_snd u_snd(
+    .clk        ( clk           ),
+    .LHBL       ( LHBL          ), // 15kHz base tone
+    .dwnld_busy ( dwnld_busy    ),
+    .bad        ( bad           ),
+    .snd        ( snd           )
+);
 
-
-// CPU clock enable signals come from 48MHz domain
 jtframe_cen48 u_cen48(
     .clk        ( clk           ),
-    .cen16      ( cen16         ),
+    .cen16      (               ),
     .cen12      ( pxl2_cen      ),
-    .cen8       ( cen8          ),
+    .cen8       (               ),
     .cen6       ( pxl_cen       ),
     .cen4       (               ),
     .cen4_12    (               ),
@@ -125,11 +131,38 @@ jtframe_cen48 u_cen48(
     .cen1p5b    (               )
 );
 
-jtsdram_check #(.CPS(15), .REGSIZE(REGSIZE)) u_sdram (
+// Same parameters as Bubble Bobble core
+jtframe_vtimer #(
+    .HB_START( 9'd255 ),
+    .HS_START( 9'd287 ),
+    .HB_END  ( 9'd383 ),
+    .V_START ( 9'd016 ),
+    .VS_START( 9'd254 ),
+    .VB_START( 9'd240 ),
+    .VB_END  ( 9'd279 )
+)
+u_timer(
+    .clk        ( clk           ),
+    .pxl_cen    ( pxl_cen       ),
+    .vdump      (               ),
+    .vrender    (               ),
+    .vrender1   (               ),
+    .H          (               ),
+    .Hinit      (               ),
+    .Vinit      (               ),
+    .LHBL       ( LHBL          ),
+    .LVBL       ( LVBL          ),
+    .HS         ( HS            ),
+    .VS         ( VS            )
+);
+
+jtsdram_checker u_sdram (
     .rst         ( rst           ),
-    .clk         ( clk           ),        // 96   MHz
+    .clk         ( clk           ),
     .LVBL        ( LVBL          ),
 
+    .dwnld_busy  ( dwnld_busy    ),
+    .bad         ( bad           ),
 
     .prog_addr   ( prog_addr     ),
     .prog_data   ( prog_data     ),
