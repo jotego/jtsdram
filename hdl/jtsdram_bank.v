@@ -19,6 +19,7 @@
 module jtsdram_bank(
     input             rst,
     input             clk,
+    input             LVBL,
     output reg [21:0] addr,
     output reg        rd,
     input             ack,
@@ -41,7 +42,7 @@ always @(posedge clk, posedge rst) begin
             rd   <= 1;
             done <= 0;
             bad  <= 0;
-        end else if(!done) begin
+        end else if(!done && LVBL ) begin
             if( ack ) begin
                 rd <= 0;
             end

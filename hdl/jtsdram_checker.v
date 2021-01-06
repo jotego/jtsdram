@@ -75,7 +75,7 @@ wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 wire        prog_start, prog_done, rd_start,
             ba0_done, ba1_done, ba2_done, ba3_done;
 
-assign refresh_en = ~LVBL;
+assign refresh_en = ~LVBL & ~dwnld_busy;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 
 // Bank 0 writting not used for now
@@ -110,6 +110,7 @@ jtsdram_prog u_prog(
     .start      ( prog_start    ),
     .done       ( prog_done     ),
     .dwnld_busy ( dwnld_busy    ),
+    .LVBL       ( LVBL          ),
 
     .ba0_data   ( ba0_data_ref  ),
     .ba1_data   ( ba1_data_ref  ),
@@ -169,6 +170,7 @@ jtsdram_shuffle u_sh3(
 jtsdram_bank u_ch0(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
     .addr       ( ba0_preaddr   ),
     .rd         ( ba0_rd        ),
     .ack        ( ba0_ack       ),
@@ -183,6 +185,7 @@ jtsdram_bank u_ch0(
 jtsdram_bank u_ch1(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
     .addr       ( ba1_preaddr   ),
     .rd         ( ba1_rd        ),
     .ack        ( ba1_ack       ),
@@ -197,6 +200,7 @@ jtsdram_bank u_ch1(
 jtsdram_bank u_ch2(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
     .addr       ( ba2_preaddr   ),
     .rd         ( ba2_rd        ),
     .ack        ( ba2_ack       ),
@@ -211,6 +215,7 @@ jtsdram_bank u_ch2(
 jtsdram_bank u_ch3(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
     .addr       ( ba3_preaddr   ),
     .rd         ( ba3_rd        ),
     .ack        ( ba3_ack       ),
@@ -221,5 +226,12 @@ jtsdram_bank u_ch3(
     .bad        ( ba3_bad       ),
     .done       ( ba3_done      )
 );
+
+`ifdef SIMULATION
+always @(posedge bad) begin
+    $display("SDRAM check failed");
+    #100 $finish;
+end
+`endif
 
 endmodule

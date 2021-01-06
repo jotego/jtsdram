@@ -21,6 +21,7 @@ module jtsdram_prog(
     input             clk,
 
     input             start,
+    input             LVBL,
     output reg        done,
     output reg        dwnld_busy,
     input      [15:0] ba0_data,
@@ -38,7 +39,7 @@ module jtsdram_prog(
 );
 
 reg  [24:0] full_addr;
-reg         half, wait_rdy;
+reg         half, wait_rdy, rfsh, last_LVBL;
 
 assign prog_mask = { half, ~half } | {2{done}};
 assign prog_rd = 0;
@@ -54,6 +55,7 @@ always @(posedge clk or posedge rst) begin
         prog_addr  <= 22'd0;
         prog_ba    <= 2'd0;
         wait_rdy   <= 0;
+        rfsh       <= 0;
     end else begin
         if( start ) begin
             dwnld_busy <= 1;
@@ -62,15 +64,22 @@ always @(posedge clk or posedge rst) begin
             wait_rdy   <= 0;
         end else begin
             if( !done && !wait_rdy ) begin
-                case( prog_ba )
-                    2'd0: prog_data <= ba0_data;
-                    2'd1: prog_data <= ba1_data;
-                    2'd2: prog_data <= ba2_data;
-                    2'd3: prog_data <= ba3_data;
-                endcase // prog_ba
-                { prog_ba, prog_addr, half } <= full_addr;
-                prog_we   <= 1;
-                wait_rdy  <= 1;
+                last_LVBL <= LVBL;
+                if( LVBL && !last_LVBL ) rfsh <= ~rfsh;
+                if( LVBL || !rfsh ) begin
+                    case( prog_ba )
+                        2'd0: prog_data <= ba0_data;
+                        2'd1: prog_data <= ba1_data;
+                        2'd2: prog_data <= ba2_data;
+                        2'd3: prog_data <= ba3_data;
+                    endcase // prog_ba
+                    { prog_ba, prog_addr, half } <= full_addr;
+                    prog_we   <= 1;
+                    wait_rdy  <= 1;
+                    dwnld_busy <= 1;
+                end else begin
+                    dwnld_busy <= 0;
+                end
             end
             if( prog_ack ) begin
                 prog_we  <= 0;

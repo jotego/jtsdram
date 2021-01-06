@@ -20,7 +20,7 @@ module jtsdram_video(
     input            clk,
     input            LVBL,
     input            LHBL,
-    input      [7:0] vdump,
+    input      [8:0] vdump,
     input            dwnld_busy,
     input            ba0_bad,
     input            ba1_bad,

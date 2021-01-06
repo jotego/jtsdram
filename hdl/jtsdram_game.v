@@ -95,7 +95,7 @@ module jtsdram_game(
 );
 
 wire LHBL, LVBL, bad;
-wire [7:0] vdump;
+wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
