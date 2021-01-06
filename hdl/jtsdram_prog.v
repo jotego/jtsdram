@@ -67,7 +67,7 @@ always @(posedge clk or posedge rst) begin
                 last_LVBL <= LVBL;
                 if( LVBL && !last_LVBL ) rfsh <= ~rfsh;
                 if( LVBL || !rfsh ) begin
-                    case( prog_ba )
+                    case( full_addr[2:1] )
                         2'd0: prog_data <= ba0_data;
                         2'd1: prog_data <= ba1_data;
                         2'd2: prog_data <= ba2_data;
