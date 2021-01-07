@@ -246,6 +246,9 @@ assign ba2_rd = 0;
 assign ba2_done = 1;
 assign ba3_rd = 0;
 assign ba3_done = 1;
+assign ba1_bad = 0;
+assign ba2_bad = 0;
+assign ba3_bad = 0;
 `endif
 
 `ifdef SIMULATION

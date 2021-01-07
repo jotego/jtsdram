@@ -64,7 +64,7 @@ always @(posedge clk, posedge rst) begin
                         dly_rd <= 1;
                 end
                 addr <= addr + 1'd1;
-                if( data_read != {2{data_ref}} ) bad <= 1;
+                if( data_read[15:0] != data_ref ) bad <= 1;
             end
         end
     end

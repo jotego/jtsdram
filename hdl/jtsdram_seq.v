@@ -41,9 +41,17 @@ reg        prog_wait, rd_wait;
 
 reg [ 1:0] times;
 reg [15:0] lfsr;
+
+wire       times_done;
 // D295
 // 1101 0010 1001 0101
 wire       lfsr_fb = ^{ lfsr[15:14], lfsr[12], lfsr[9], lfsr[7], lfsr[4], lfsr[2], lfsr[0] };
+
+`ifdef ONEBANK
+assign times_done = ~times[0];
+`else
+assign times_done = &times;
+`endif
 
 assign ba0_key = lfsr[ 4: 0];
 assign ba1_key = lfsr[ 9: 5];
@@ -78,7 +86,7 @@ always @(posedge clk or posedge rst) begin
                 rd_start <= 0;
                 if( !rd_start && ba0_done && ba1_done && ba2_done && ba3_done ) begin
                     times <= times +1'd1;
-                    if( &times ) begin
+                    if( times_done ) begin
                         rd_wait <= 0;
                         // advance lfsr
                         lfsr <= { lfsr_fb, lfsr[15:1] };
