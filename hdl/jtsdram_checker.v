@@ -68,7 +68,8 @@ module jtsdram_checker(
     output          refresh_en
 );
 
-wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr, next_addr;
+wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr, next_addr,
+            ba0_coded_addr, ba1_coded_addr, ba2_coded_addr, ba3_coded_addr;
 wire [15:0] ba0_data_ref, ba1_data_ref, ba2_data_ref, ba3_data_ref, data_ref;
 wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 
@@ -139,7 +140,7 @@ jtsdram_shuffle u_sh0(
     .prog_addr  ( next_addr     ),
     .key        ( ba0_key       ),
     .addr_in    ( ba0_preaddr   ),
-    .addr_out   ( ba0_addr      ),
+    .addr_out   ( ba0_coded_addr),
     .ref_in     ( data_ref      ),
     .ref_out    ( ba0_data_ref  )
 );
@@ -168,7 +169,9 @@ jtsdram_bank_ro u_ch0(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
-    .addr       ( ba0_preaddr   ),
+    .cnt_addr   ( ba0_preaddr   ),
+    .sdram_addr ( ba0_addr      ),
+    .coded_addr ( ba0_coded_addr),
     .rd         ( ba0_rd        ),
     .ack        ( ba0_ack       ),
     .rdy        ( ba0_rdy       ),
@@ -188,7 +191,7 @@ jtsdram_shuffle u_sh1(
     .prog_addr  ( next_addr     ),
     .key        ( ba1_key       ),
     .addr_in    ( ba1_preaddr   ),
-    .addr_out   ( ba1_addr      ),
+    .addr_out   ( ba1_coded_addr),
     .ref_in     ( data_ref      ),
     .ref_out    ( ba1_data_ref  )
 );
@@ -200,7 +203,7 @@ jtsdram_shuffle u_sh2(
     .prog_addr  ( next_addr     ),
     .key        ( ba2_key       ),
     .addr_in    ( ba2_preaddr   ),
-    .addr_out   ( ba2_addr      ),
+    .addr_out   ( ba2_coded_addr),
     .ref_in     ( data_ref      ),
     .ref_out    ( ba2_data_ref  )
 );
@@ -212,7 +215,7 @@ jtsdram_shuffle u_sh3(
     .prog_addr  ( next_addr     ),
     .key        ( ba3_key       ),
     .addr_in    ( ba3_preaddr   ),
-    .addr_out   ( ba3_addr      ),
+    .addr_out   ( ba3_coded_addr),
     .ref_in     ( data_ref      ),
     .ref_out    ( ba3_data_ref  )
 );
@@ -221,7 +224,9 @@ jtsdram_bank_ro u_ch1(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
-    .addr       ( ba1_preaddr   ),
+    .cnt_addr   ( ba1_preaddr   ),
+    .sdram_addr ( ba1_addr      ),
+    .coded_addr ( ba1_coded_addr),
     .rd         ( ba1_rd        ),
     .ack        ( ba1_ack       ),
     .rdy        ( ba1_rdy       ),
@@ -237,7 +242,9 @@ jtsdram_bank_ro u_ch2(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
-    .addr       ( ba2_preaddr   ),
+    .cnt_addr   ( ba2_preaddr   ),
+    .sdram_addr ( ba2_addr      ),
+    .coded_addr ( ba2_coded_addr),
     .rd         ( ba2_rd        ),
     .ack        ( ba2_ack       ),
     .rdy        ( ba2_rdy       ),
@@ -253,7 +260,9 @@ jtsdram_bank_ro u_ch3(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
-    .addr       ( ba3_preaddr   ),
+    .cnt_addr   ( ba3_preaddr   ),
+    .sdram_addr ( ba3_addr      ),
+    .coded_addr ( ba3_coded_addr),
     .rd         ( ba3_rd        ),
     .ack        ( ba3_ack       ),
     .rdy        ( ba3_rdy       ),

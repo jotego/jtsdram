@@ -20,7 +20,9 @@ module jtsdram_bank_ro(
     input             rst,
     input             clk,
     input             LVBL,
-    output     [21:0] addr,
+    output reg [21:0] cnt_addr,
+    output     [21:0] sdram_addr,
+    input      [21:0] coded_addr,
     output            rd,
 
     input             ack,
@@ -33,7 +35,6 @@ module jtsdram_bank_ro(
     output reg        done
 );
 
-reg [21:0]  cnt_addr;
 reg         cs, dly_cs, clr, ok_wait;
 reg  [ 3:0] slow_cnt;
 wire [15:0] lfsr, dout;
@@ -90,7 +91,7 @@ always @(posedge clk, posedge rst) begin
                     end
                 end
                 cnt_addr <= cnt_addr + 1'd1;
-                if( dout != data_ref ) bad <= 1;
+                if( dout !== data_ref ) bad <= 1;
             end
         end
     end
@@ -120,14 +121,14 @@ jtframe_romrq #(
     .clk        ( clk           ),
     .clr        ( clr           ), // clears the cache
     .offset     ( 22'd0         ),
-    .addr       ( cnt_addr      ),
+    .addr       ( coded_addr    ),
     .addr_ok    ( cs            ),
     .din        ( data_read     ),
     .din_ok     ( rdy           ),
     .we         ( we            ),
     .req        ( rd            ),
     .data_ok    ( dout_ok       ),    // strobe that signals that data is ready
-    .sdram_addr ( addr          ),
+    .sdram_addr ( sdram_addr    ),
     .dout       ( dout          )
 );
 
