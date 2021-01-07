@@ -34,7 +34,7 @@ always @(posedge clk, posedge rst) begin
     end else begin
         last_LVBL <= LVBL;
         if( LVBL && !last_LVBL ) cnt<=cnt+1'd1;
-        led <= bad ? cnt[4] : cnt[0];
+        led <= bad ? cnt[4] : 1'b0;
     end
 end
 
