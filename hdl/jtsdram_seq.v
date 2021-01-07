@@ -77,6 +77,9 @@ always @(posedge clk or posedge rst) begin
                 prog_start <= 1;
                 prog_wait  <= 1;
                 times      <= 2'd0;
+                `ifdef SIMULATION
+                $display("Programming starts");
+                `endif
             end
             2'b10: begin
                 prog_start <= 0;
