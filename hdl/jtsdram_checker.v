@@ -72,16 +72,17 @@ wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr, next_addr;
 wire [15:0] ba0_data_ref, ba1_data_ref, ba2_data_ref, ba3_data_ref, data_ref;
 wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 
-wire        prog_start, prog_done, rd_start, prog_rfsh,
-            ba0_done, ba1_done, ba2_done, ba3_done;
+wire        prog_start, prog_done, rd_start, prog_rfsh, slow,
+            ba0_done, ba1_done, ba2_done, ba3_done,
+            ba0_we;
 
 assign refresh_en = dwnld_busy ? prog_rfsh : ~LVBL;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 
 // Bank 0 writting not used for now
 assign ba0_wr    = 0;
-assign ba0_din   = 16'd0;
-assign ba0_din_m = 2'b11;
+assign ba0_din   = ba0_data_ref;
+assign ba0_din_m = 2'b00;
 
 jtsdram_seq u_seq(
     .rst        ( rst           ),
@@ -97,6 +98,8 @@ jtsdram_seq u_seq(
     .prog_done  ( prog_done     ),
 
     .rd_start   ( rd_start      ),
+    .slow       ( slow          ),
+    .ba0_we     ( ba0_we        ),
     .ba0_done   ( ba0_done      ),
     .ba1_done   ( ba1_done      ),
     .ba2_done   ( ba2_done      ),
@@ -148,10 +151,13 @@ jtsdram_bank u_ch0(
     .LVBL       ( LVBL          ),
     .addr       ( ba0_preaddr   ),
     .rd         ( ba0_rd        ),
+    .wr         ( ba0_wr        ),
+    .we         ( ba0_we        ),
     .ack        ( ba0_ack       ),
     .rdy        ( ba0_rdy       ),
     .data_ref   ( ba0_data_ref  ),
     .start      ( rd_start      ),
+    .slow       ( slow          ),
     .data_read  ( data_read     ),
     .bad        ( ba0_bad       ),
     .done       ( ba0_done      )
@@ -200,10 +206,13 @@ jtsdram_bank u_ch1(
     .LVBL       ( LVBL          ),
     .addr       ( ba1_preaddr   ),
     .rd         ( ba1_rd        ),
+    .wr         (               ),
+    .we         ( 1'b0          ),
     .ack        ( ba1_ack       ),
     .rdy        ( ba1_rdy       ),
     .data_ref   ( ba1_data_ref  ),
     .start      ( rd_start      ),
+    .slow       ( slow          ),
     .data_read  ( data_read     ),
     .bad        ( ba1_bad       ),
     .done       ( ba1_done      )
@@ -215,10 +224,13 @@ jtsdram_bank u_ch2(
     .LVBL       ( LVBL          ),
     .addr       ( ba2_preaddr   ),
     .rd         ( ba2_rd        ),
+    .wr         (               ),
+    .we         ( 1'b0          ),
     .ack        ( ba2_ack       ),
     .rdy        ( ba2_rdy       ),
     .data_ref   ( ba2_data_ref  ),
     .start      ( rd_start      ),
+    .slow       ( slow          ),
     .data_read  ( data_read     ),
     .bad        ( ba2_bad       ),
     .done       ( ba2_done      )
@@ -230,10 +242,13 @@ jtsdram_bank u_ch3(
     .LVBL       ( LVBL          ),
     .addr       ( ba3_preaddr   ),
     .rd         ( ba3_rd        ),
+    .wr         (               ),
+    .we         ( 1'b0          ),
     .ack        ( ba3_ack       ),
     .rdy        ( ba3_rdy       ),
     .data_ref   ( ba3_data_ref  ),
     .start      ( rd_start      ),
+    .slow       ( slow          ),
     .data_read  ( data_read     ),
     .bad        ( ba3_bad       ),
     .done       ( ba3_done      )

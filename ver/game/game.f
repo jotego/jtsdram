@@ -7,6 +7,7 @@
 ../../hdl/jtsdram_snd.v
 ../../hdl/jtsdram_video.v
 ../../hdl/jtsdram_led.v
+../../hdl/jtsdram_rnd.v
 $JTFRAME/hdl/clocking/jtframe_cen48.v
 $JTFRAME/hdl/video/jtframe_vtimer.v
 -F $JTFRAME/hdl/sdram/jtframe_sdram_bank.f

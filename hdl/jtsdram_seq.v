@@ -31,6 +31,8 @@ module jtsdram_seq(
     input            prog_done,
 
     output reg       rd_start,
+    output           slow,
+    output           ba0_we,
     input            ba0_done,
     input            ba1_done,
     input            ba2_done,
@@ -47,11 +49,13 @@ wire       times_done;
 // 1101 0010 1001 0101
 wire       lfsr_fb = ^{ lfsr[15:14], lfsr[12], lfsr[9], lfsr[7], lfsr[4], lfsr[2], lfsr[0] };
 
-`ifdef ONEBANK
-assign times_done = ~times[0];
-`else
+//`ifdef ONEBANK
+//assign times_done = ~times[0];
+//`else
 assign times_done = &times;
-`endif
+assign slow   = times[1];
+assign ba0_we = times[0];
+//`endif
 
 assign ba0_key = lfsr[ 4: 0];
 assign ba1_key = lfsr[ 9: 5];

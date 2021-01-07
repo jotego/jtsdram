@@ -7,6 +7,7 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_snd.v      ]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_video.v    ]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_led.v      ]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtsdram_rnd.v      ]
 
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ../modules/jtframe/hdl/clocking/jtframe_cen48.v      ]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) ../modules/jtframe/hdl/video/jtframe_vtimer.v        ]

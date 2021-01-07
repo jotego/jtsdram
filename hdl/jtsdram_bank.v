@@ -22,33 +22,59 @@ module jtsdram_bank(
     input             LVBL,
     output reg [21:0] addr,
     output reg        rd,
+    output reg        wr,
+
     input             ack,
     input             rdy,
+    input             we,
     input      [15:0] data_ref,
     input             start,
+    input             slow,
     input      [31:0] data_read,
     output reg        bad,
     output reg        done
 );
 
-reg dly_rd;
+reg         dly_rd, wrtng;
+reg  [ 3:0] slow_cnt;
+wire [15:0] lfsr;
+wire        slow_done;
+
+assign slow_done = &slow_cnt;
+
+jtsdram_rnd u_rnd(
+    .rst    ( rst       ),
+    .clk    ( clk       ),
+    .adv    ( 1'b1      ),
+    .lfsr   ( lfsr      )
+);
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        addr   <= 22'd0;
-        bad    <= 0;
-        done   <= 0;
-        dly_rd <= 0;
+        addr     <= 22'd0;
+        bad      <= 0;
+        done     <= 0;
+        dly_rd   <= 0;
+        rd       <= 0;
+        wr       <= 0;
+        slow_cnt <= 4'd0;
     end else begin
+        if(!slow_done) slow_cnt<=slow_cnt+1'd1;
         if(start) begin
             addr <= 22'd0;
             rd   <= 1;
             done <= 0;
             // bad  <= 0;
         end else if(!done) begin
-            if( dly_rd && LVBL ) begin
+            if( dly_rd && ( !slow ? LVBL : slow_done) ) begin
                 dly_rd <= 0;
-                rd     <= 1;
+                if( !we || lfsr[0] ) begin
+                    rd    <= 1;
+                    wrtng <= 0;
+                end else begin
+                    wr    <= 1;
+                    wrtng <= 1;
+                end
             end
             if( ack ) begin
                 rd <= 0;
@@ -57,14 +83,22 @@ always @(posedge clk, posedge rst) begin
                 if( &addr )
                     done <= 1;
                 else begin
-                    if( LVBL ) begin
-                        rd     <= 1;
+                    if( LVBL && !slow ) begin
+                        if( !we || lfsr[0] ) begin
+                            rd <= 1;
+                            wrtng <= 0;
+                        end else begin
+                            wr    <= 1;
+                            wrtng <= 1;
+                        end
                         dly_rd <= 0;
-                    end else
+                    end else begin
                         dly_rd <= 1;
+                        slow_cnt <= lfsr[3:0];
+                    end
                 end
                 addr <= addr + 1'd1;
-                if( data_read[15:0] != data_ref ) bad <= 1;
+                if( data_read[15:0] != data_ref && !wrtng ) bad <= 1;
             end
         end
     end
