@@ -1,5 +1,6 @@
 ../../hdl/jtsdram_game.v
 ../../hdl/jtsdram_bank.v
+../../hdl/jtsdram_bank_ro.v
 ../../hdl/jtsdram_checker.v
 ../../hdl/jtsdram_prog.v
 ../../hdl/jtsdram_seq.v

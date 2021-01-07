@@ -84,6 +84,9 @@ always @(posedge clk or posedge rst) begin
                     prog_wait <= 0;
                     rd_start  <= 1;
                     rd_wait   <= 1;
+                    `ifdef SIMULATION
+                    $display("Programming done");
+                    `endif
                 end
             end
             2'b01: begin

@@ -143,7 +143,7 @@ jtsdram_shuffle u_sh0(
     .ref_in     ( data_ref      ),
     .ref_out    ( ba0_data_ref  )
 );
-
+/*
 jtsdram_bank u_ch0(
     .rst        ( rst           ),
     .clk        ( clk           ),
@@ -152,6 +152,22 @@ jtsdram_bank u_ch0(
     .rd         ( ba0_rd        ),
     .wr         ( ba0_wr        ),
     .we         ( ba0_we        ),
+    .ack        ( ba0_ack       ),
+    .rdy        ( ba0_rdy       ),
+    .data_ref   ( ba0_data_ref  ),
+    .start      ( rd_start      ),
+    .slow       ( slow          ),
+    .data_read  ( data_read     ),
+    .bad        ( ba0_bad       ),
+    .done       ( ba0_done      )
+);*/
+
+jtsdram_bank_ro u_ch0(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .LVBL       ( LVBL          ),
+    .addr       ( ba0_preaddr   ),
+    .rd         ( ba0_rd        ),
     .ack        ( ba0_ack       ),
     .rdy        ( ba0_rdy       ),
     .data_ref   ( ba0_data_ref  ),
@@ -199,14 +215,12 @@ jtsdram_shuffle u_sh3(
     .ref_out    ( ba3_data_ref  )
 );
 
-jtsdram_bank u_ch1(
+jtsdram_bank_ro u_ch1(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
     .addr       ( ba1_preaddr   ),
     .rd         ( ba1_rd        ),
-    .wr         (               ),
-    .we         ( 1'b0          ),
     .ack        ( ba1_ack       ),
     .rdy        ( ba1_rdy       ),
     .data_ref   ( ba1_data_ref  ),
@@ -217,14 +231,12 @@ jtsdram_bank u_ch1(
     .done       ( ba1_done      )
 );
 
-jtsdram_bank u_ch2(
+jtsdram_bank_ro u_ch2(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
     .addr       ( ba2_preaddr   ),
     .rd         ( ba2_rd        ),
-    .wr         (               ),
-    .we         ( 1'b0          ),
     .ack        ( ba2_ack       ),
     .rdy        ( ba2_rdy       ),
     .data_ref   ( ba2_data_ref  ),
@@ -235,14 +247,12 @@ jtsdram_bank u_ch2(
     .done       ( ba2_done      )
 );
 
-jtsdram_bank u_ch3(
+jtsdram_bank_ro u_ch3(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
     .addr       ( ba3_preaddr   ),
     .rd         ( ba3_rd        ),
-    .wr         (               ),
-    .we         ( 1'b0          ),
     .ack        ( ba3_ack       ),
     .rdy        ( ba3_rdy       ),
     .data_ref   ( ba3_data_ref  ),
