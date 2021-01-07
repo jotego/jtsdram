@@ -131,6 +131,8 @@ jtsdram_prog u_prog(
 jtsdram_shuffle u_sh0(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( prog_addr     ),
     .key        ( ba0_key       ),
     .addr_in    ( ba0_preaddr   ),
     .addr_out   ( ba0_addr      ),
@@ -141,6 +143,8 @@ jtsdram_shuffle u_sh0(
 jtsdram_shuffle u_sh1(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( prog_addr     ),
     .key        ( ba1_key       ),
     .addr_in    ( ba1_preaddr   ),
     .addr_out   ( ba1_addr      ),
@@ -151,6 +155,8 @@ jtsdram_shuffle u_sh1(
 jtsdram_shuffle u_sh2(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( prog_addr     ),
     .key        ( ba2_key       ),
     .addr_in    ( ba2_preaddr   ),
     .addr_out   ( ba2_addr      ),
@@ -161,6 +167,8 @@ jtsdram_shuffle u_sh2(
 jtsdram_shuffle u_sh3(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( prog_addr     ),
     .key        ( ba3_key       ),
     .addr_in    ( ba3_preaddr   ),
     .addr_out   ( ba3_addr      ),

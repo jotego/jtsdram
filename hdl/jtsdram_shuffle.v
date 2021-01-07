@@ -21,10 +21,14 @@ module jtsdram_shuffle(
     input             clk,
     input      [ 4:0] key,
     input      [21:0] addr_in,
+    input      [21:0] prog_addr,
+    input             prog_en,
     output reg [21:0] addr_out,
     input      [15:0] ref_in,
     output reg [15:0] ref_out
 );
+
+wire [3:0] addr_eff = prog_en ? prog_addr[3:0] : addr_out[3:0];
 
 function [3:0] swap;
     input [3:0] a;
@@ -47,13 +51,13 @@ end
 
 always @(*) begin
     ref_out = ref_in;
-    if( key[0] )
+    if( key[0] ^ addr_eff[0] )
         ref_out = { ref_out[7:0], ref_out[15:8] };
-    if( key[1] )
+    if( key[1] ^ addr_eff[1] )
         ref_out = { ref_out[15:8], swap(ref_out[7:4]), swap(ref_out[3:0]) };
-    if( key[2] )
+    if( key[2] ^ addr_eff[2] )
         ref_out = { swap(ref_out[15:12]), swap(ref_out[11:8]), ref_out[7:0] };
-    if( key[3])
+    if( key[3] ^ addr_eff[3] )
         ref_out = ref_out ^ 16'h5555;
     if( key[4])
         ref_out = ref_out ^ 16'haaaa;

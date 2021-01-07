@@ -97,7 +97,7 @@ module jtsdram_game(
     input   [3:0]   gfx_en
 );
 
-wire LHBL, LVBL, bad=1;
+wire LHBL, LVBL, bad;
 wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
@@ -184,7 +184,7 @@ jtsdram_checker u_checker(
     .LVBL        ( LVBL          ),
 
     .dwnld_busy  ( dwnld_busy    ),
-    //.bad         ( bad           ),
+    .bad         ( bad           ),
     .ba0_bad     ( ba0_bad       ),
     .ba1_bad     ( ba1_bad       ),
     .ba2_bad     ( ba2_bad       ),
