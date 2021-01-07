@@ -93,7 +93,6 @@ always @(posedge clk, posedge rst) begin
                 cnt_addr <= cnt_addr + 1'd1;
                 if( dout !== data_ref ) bad <= 1;
             end
-            else if(!dly_cs && !cs) cs <= 1;
         end
     end
 end
