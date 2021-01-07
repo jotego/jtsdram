@@ -31,9 +31,13 @@ module jtsdram_video(
     output     [3:0] blue
 );
 
-reg bad;
+reg        bad;
+reg [15:0] lfsr;
+// D295
+// 1101 0010 1001 0101
+wire       lfsr_fb = ^{ lfsr[15:14], lfsr[12], lfsr[9], lfsr[7], lfsr[4], lfsr[2], lfsr[0] };
 
-assign blue = 4'd0;
+assign blue = { 2'd0, lfsr[1:0] };
 
 always @(*) begin
     case( vdump[7:6] )
@@ -44,13 +48,18 @@ always @(*) begin
     endcase
 end
 
+initial begin
+    lfsr = 16'haaaa;
+end
+
 always @(posedge clk) begin
     if( !LHBL || !LVBL ) begin
         green <= 4'd0;
         red   <= 4'd0;
     end else begin
-        green <= {4{~bad}} >> dwnld_busy;
-        red   <= {4{bad}} >> dwnld_busy;
+        lfsr  <= { lfsr_fb, lfsr[15:1] };
+        green <= ({4{~bad}} & lfsr[15:12]) >> dwnld_busy;
+        red   <= ({4{ bad}} & lfsr[15:12]) >> dwnld_busy;
     end
 end
 
