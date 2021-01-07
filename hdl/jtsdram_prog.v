@@ -29,6 +29,7 @@ module jtsdram_prog(
     input      [15:0] ba2_data,
     input      [15:0] ba3_data,
     output reg [21:0] prog_addr,
+    output     [21:0] next_addr,
     output reg [15:0] prog_data,
     output     [ 1:0] prog_mask,
     output reg [ 1:0] prog_ba,
@@ -42,9 +43,18 @@ module jtsdram_prog(
 reg  [24:0] full_addr;
 reg         half, wait_rdy, last_LVBL, rfsh_frame;
 
+wire        addr_done;
+
 assign prog_mask = { half, ~half } | {2{done}};
 assign prog_rd = 0;
 assign rfsh = rfsh_frame & ~LVBL;
+assign next_addr = full_addr[22:1];
+
+`ifdef ONEBANK
+assign addr_done = &full_addr[22:0];
+`else
+assign addr_done = &full_addr;
+`endif
 
 always @(posedge clk or posedge rst) begin
     if(rst) begin
@@ -85,7 +95,7 @@ always @(posedge clk or posedge rst) begin
             if( prog_rdy ) begin
                 wait_rdy  <= 0;
                 full_addr <= full_addr + 1'd1;
-                if( &full_addr ) begin
+                if( addr_done ) begin
                     done       <= 1;
                     dwnld_busy <= 0;
                 end

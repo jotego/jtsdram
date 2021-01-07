@@ -68,7 +68,7 @@ module jtsdram_checker(
     output          refresh_en
 );
 
-wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr;
+wire [21:0] ba0_preaddr, ba1_preaddr, ba2_preaddr, ba3_preaddr, next_addr;
 wire [15:0] ba0_data_ref, ba1_data_ref, ba2_data_ref, ba3_data_ref, data_ref;
 wire [ 4:0] ba0_key, ba1_key, ba2_key, ba3_key;
 
@@ -118,6 +118,8 @@ jtsdram_prog u_prog(
     .ba2_data   ( ba2_data_ref  ),
     .ba3_data   ( ba3_data_ref  ),
 
+    .next_addr  ( next_addr     ),
+
     .prog_addr  ( prog_addr     ),
     .prog_data  ( prog_data     ),
     .prog_mask  ( prog_mask     ),
@@ -132,48 +134,12 @@ jtsdram_shuffle u_sh0(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .prog_en    ( dwnld_busy    ),
-    .prog_addr  ( prog_addr     ),
+    .prog_addr  ( next_addr     ),
     .key        ( ba0_key       ),
     .addr_in    ( ba0_preaddr   ),
     .addr_out   ( ba0_addr      ),
     .ref_in     ( data_ref      ),
     .ref_out    ( ba0_data_ref  )
-);
-
-jtsdram_shuffle u_sh1(
-    .rst        ( rst           ),
-    .clk        ( clk           ),
-    .prog_en    ( dwnld_busy    ),
-    .prog_addr  ( prog_addr     ),
-    .key        ( ba1_key       ),
-    .addr_in    ( ba1_preaddr   ),
-    .addr_out   ( ba1_addr      ),
-    .ref_in     ( data_ref      ),
-    .ref_out    ( ba1_data_ref  )
-);
-
-jtsdram_shuffle u_sh2(
-    .rst        ( rst           ),
-    .clk        ( clk           ),
-    .prog_en    ( dwnld_busy    ),
-    .prog_addr  ( prog_addr     ),
-    .key        ( ba2_key       ),
-    .addr_in    ( ba2_preaddr   ),
-    .addr_out   ( ba2_addr      ),
-    .ref_in     ( data_ref      ),
-    .ref_out    ( ba2_data_ref  )
-);
-
-jtsdram_shuffle u_sh3(
-    .rst        ( rst           ),
-    .clk        ( clk           ),
-    .prog_en    ( dwnld_busy    ),
-    .prog_addr  ( prog_addr     ),
-    .key        ( ba3_key       ),
-    .addr_in    ( ba3_preaddr   ),
-    .addr_out   ( ba3_addr      ),
-    .ref_in     ( data_ref      ),
-    .ref_out    ( ba3_data_ref  )
 );
 
 jtsdram_bank u_ch0(
@@ -189,6 +155,43 @@ jtsdram_bank u_ch0(
     .data_read  ( data_read     ),
     .bad        ( ba0_bad       ),
     .done       ( ba0_done      )
+);
+
+`ifndef ONEBANK
+jtsdram_shuffle u_sh1(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( next_addr     ),
+    .key        ( ba1_key       ),
+    .addr_in    ( ba1_preaddr   ),
+    .addr_out   ( ba1_addr      ),
+    .ref_in     ( data_ref      ),
+    .ref_out    ( ba1_data_ref  )
+);
+
+jtsdram_shuffle u_sh2(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( next_addr     ),
+    .key        ( ba2_key       ),
+    .addr_in    ( ba2_preaddr   ),
+    .addr_out   ( ba2_addr      ),
+    .ref_in     ( data_ref      ),
+    .ref_out    ( ba2_data_ref  )
+);
+
+jtsdram_shuffle u_sh3(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .prog_en    ( dwnld_busy    ),
+    .prog_addr  ( next_addr     ),
+    .key        ( ba3_key       ),
+    .addr_in    ( ba3_preaddr   ),
+    .addr_out   ( ba3_addr      ),
+    .ref_in     ( data_ref      ),
+    .ref_out    ( ba3_data_ref  )
 );
 
 jtsdram_bank u_ch1(
@@ -235,6 +238,15 @@ jtsdram_bank u_ch3(
     .bad        ( ba3_bad       ),
     .done       ( ba3_done      )
 );
+
+`else
+assign ba1_rd = 0;
+assign ba1_done = 1;
+assign ba2_rd = 0;
+assign ba2_done = 1;
+assign ba3_rd = 0;
+assign ba3_done = 1;
+`endif
 
 `ifdef SIMULATION
 always @(posedge bad) begin
