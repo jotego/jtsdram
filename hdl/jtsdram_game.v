@@ -19,6 +19,7 @@
 module jtsdram_game(
     input           rst,
     input           clk,      // 48   MHz
+    // Video
     output          pxl2_cen,   // 12   MHz
     output          pxl_cen,    //  6   MHz
     output   [3:0]  red,
@@ -28,6 +29,8 @@ module jtsdram_game(
     output          LVBL_dly,
     output          HS,
     output          VS,
+    // LED
+    output          game_led,
     // cabinet I/O
     input   [ 1:0]  start_button,
     input   [ 1:0]  coin_input,
@@ -99,6 +102,14 @@ wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
+
+jtsdram_led u_led(
+    .clk        ( clk           ),
+    .rst        ( rst           ),
+    .LVBL       ( LVBL          ),
+    .bad        ( bad           ),
+    .led        ( game_led      )
+);
 
 jtsdram_video u_video(
     .clk        ( clk           ),
