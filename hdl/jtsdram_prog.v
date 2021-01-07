@@ -68,7 +68,7 @@ always @(posedge clk or posedge rst) begin
             last_LVBL <= LVBL;
             if( LVBL && !last_LVBL ) rfsh_frame <= ~rfsh_frame;
             if( !done && !wait_rdy ) begin
-                case( full_addr[2:1] )
+                case( full_addr[24:23] )
                     2'd0: prog_data <= ba0_data;
                     2'd1: prog_data <= ba1_data;
                     2'd2: prog_data <= ba2_data;
