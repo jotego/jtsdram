@@ -75,10 +75,13 @@ always @(posedge clk, posedge rst) begin
                 cs      <= 1;
                 ok_wait <= 1;
             end
-            else if( dout_ok && !ok_wait && cs ) begin
+            else if( dout_ok && !ok_wait ) begin
                 if( &cnt_addr ) begin
                     done <= 1;
                     clr  <= 1;
+                    `ifdef SIMULATION
+                    $display("Read-only bank verification done");
+                    `endif
                 end else begin
                     if( LVBL && !slow ) begin
                         cs      <= 1;
@@ -91,6 +94,7 @@ always @(posedge clk, posedge rst) begin
                     end
                 end
                 cnt_addr <= cnt_addr + 1'd1;
+                ok_wait  <= 1;
                 if( dout !== data_ref ) bad <= 1;
             end
         end
