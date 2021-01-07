@@ -80,7 +80,6 @@ assign refresh_en = dwnld_busy ? prog_rfsh : ~LVBL;
 assign bad = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 
 // Bank 0 writting not used for now
-assign ba0_wr    = 0;
 assign ba0_din   = ba0_data_ref;
 assign ba0_din_m = 2'b00;
 
