@@ -75,7 +75,7 @@ always @(posedge clk, posedge rst) begin
                 cs      <= 1;
                 ok_wait <= 1;
             end
-            else if( dout_ok && !ok_wait ) begin
+            else if( dout_ok && !ok_wait && cs ) begin
                 if( &cnt_addr ) begin
                     done <= 1;
                     clr  <= 1;
