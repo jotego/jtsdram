@@ -34,7 +34,7 @@ module jtsdram_bank_ro(
 );
 
 reg [21:0]  cnt_addr;
-reg         cs, dly_cs, clr;
+reg         cs, dly_cs, clr, ok_wait;
 reg  [ 3:0] slow_cnt;
 wire [15:0] lfsr, dout;
 wire        slow_done, dout_ok;
@@ -57,27 +57,32 @@ always @(posedge clk, posedge rst) begin
         cs       <= 0;
         slow_cnt <= 4'd0;
         clr      <= 0;
+        ok_wait  <= 0;
     end else begin
         if(!slow_done) slow_cnt<=slow_cnt+1'd1;
+        ok_wait <= 0;
         if(start) begin
             cnt_addr <= 22'd0;
-            cs   <= 1;
-            done <= 0;
-            clr  <= 0;
+            cs      <= 1;
+            done    <= 0;
+            clr     <= 0;
+            ok_wait <= 1;
             // bad  <= 0;
         end else if(!done) begin
             if( dly_cs && ( !slow ? LVBL : slow_done) ) begin
-                dly_cs <= 0;
-                cs     <= 1;
+                dly_cs  <= 0;
+                cs      <= 1;
+                ok_wait <= 1;
             end
-            else if( dout_ok ) begin
+            else if( dout_ok && !ok_wait ) begin
                 if( &cnt_addr ) begin
                     done <= 1;
                     clr  <= 1;
                 end else begin
                     if( LVBL && !slow ) begin
-                        cs <= 1;
-                        dly_cs <= 0;
+                        cs      <= 1;
+                        ok_wait <= 1;
+                        dly_cs  <= 0;
                     end else begin
                         cs <= 0;
                         dly_cs <= 1;

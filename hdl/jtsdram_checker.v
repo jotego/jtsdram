@@ -162,6 +162,8 @@ jtsdram_bank u_ch0(
     .done       ( ba0_done      )
 );*/
 
+assign ba0_wr = 0;
+
 jtsdram_bank_ro u_ch0(
     .rst        ( rst           ),
     .clk        ( clk           ),
