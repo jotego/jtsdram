@@ -79,6 +79,7 @@ always @(posedge clk, posedge rst) begin
                 if( &cnt_addr ) begin
                     done <= 1;
                     clr  <= 1;
+                    cs   <= 0;
                     `ifdef SIMULATION
                     $display("Read-only bank verification done");
                     `endif
@@ -92,9 +93,9 @@ always @(posedge clk, posedge rst) begin
                         dly_cs <= 1;
                         slow_cnt <= lfsr[3:0];
                     end
+                    cnt_addr <= cnt_addr + 1'd1;
+                    ok_wait  <= 1;
                 end
-                cnt_addr <= cnt_addr + 1'd1;
-                ok_wait  <= 1;
                 if( dout !== data_ref ) bad <= 1;
             end
         end
