@@ -77,6 +77,9 @@ always @(posedge clk or posedge rst) begin
                 prog_start <= 1;
                 prog_wait  <= 1;
                 times      <= 2'd0;
+                `ifdef SIMULATION
+                $display("Programming starts");
+                `endif
             end
             2'b10: begin
                 prog_start <= 0;
@@ -93,6 +96,9 @@ always @(posedge clk or posedge rst) begin
                 rd_start <= 0;
                 if( !rd_start && ba0_done && ba1_done && ba2_done && ba3_done ) begin
                     times <= times +1'd1;
+                    `ifdef SIMULATION
+                    $display("Read round completed");
+                    `endif
                     if( times_done ) begin
                         rd_wait <= 0;
                         // advance lfsr

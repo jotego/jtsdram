@@ -14,9 +14,9 @@
 
     Author: Jose Tejada Gomez. Twitter: @topapate
     Version: 1.0
-    Date: 5-1-2021 */
+    Date: 8-1-2021 */
 
-module jtsdram_bank_ro(
+module jtsdram_bank_rw(
     input             rst,
     input             clk,
     input             LVBL,
@@ -24,6 +24,8 @@ module jtsdram_bank_ro(
     output     [21:0] sdram_addr,
     input      [21:0] coded_addr,
     output            rd,
+    output            wr,
+    input             we,
 
     input             ack,
     input             rdy,
@@ -35,10 +37,14 @@ module jtsdram_bank_ro(
     output reg        done
 );
 
-reg         cs, dly_cs, clr, ok_wait, we;
+reg         cs, dly_cs, clr, ok_wait, rqsel, wrtng;
 reg  [ 3:0] slow_cnt;
 wire [15:0] lfsr, dout;
 wire        slow_done, dout_ok;
+wire        req, req_rnw;
+
+assign rd = req &  req_rnw;
+assign wr = req & ~req_rnw;
 
 assign slow_done = &slow_cnt;
 
@@ -59,6 +65,7 @@ always @(posedge clk, posedge rst) begin
         slow_cnt <= 4'd0;
         clr      <= 0;
         ok_wait  <= 0;
+        wrtng    <= 0;
     end else begin
         if(!slow_done) slow_cnt<=slow_cnt+1'd1;
         ok_wait <= 0;
@@ -68,30 +75,26 @@ always @(posedge clk, posedge rst) begin
             done    <= 0;
             clr     <= 1;
             ok_wait <= 1;
-            // bad  <= 0;
+            wrtng   <= 0;
+            dly_cs  <= 0;
         end else if(!done) begin
             if( rd ) clr <= 0;
-            if( dly_cs && ( !slow ? LVBL : slow_done) ) begin
+            if( dly_cs && ( !slow || slow_done) ) begin
                 dly_cs  <= 0;
                 cs      <= 1;
                 ok_wait <= 1;
+                wrtng   <= we && lfsr[0];
             end
-            else if( dout_ok && !ok_wait && !we ) begin
+            else if( dout_ok && !ok_wait && !rqsel ) begin
+                cs   <= 0;
                 if( &cnt_addr ) begin
                     done <= 1;
-                    cs   <= 0;
                     `ifdef SIMULATION
-                    $display("Read-only bank verification done");
+                    $display("R/W bank verification done");
                     `endif
                 end else begin
-                    if( LVBL && !slow ) begin
-                        cs      <= 1;
-                        dly_cs  <= 0;
-                    end else begin
-                        cs       <= 0;
-                        dly_cs   <= 1;
-                        slow_cnt <= lfsr[3:0];
-                    end
+                    dly_cs   <= 1;
+                    slow_cnt <= lfsr[3:0];
                     cnt_addr <= cnt_addr + 1'd1;
                     ok_wait  <= 1;
                 end
@@ -103,34 +106,30 @@ end
 
 always @(posedge clk, posedge rst ) begin
     if( rst )
-        we <= 0;
+        rqsel <= 0;
     else begin
         if( ack )
-            we <= 1;
+            rqsel <= 1;
         else if( rdy )
-            we <= 0;
+            rqsel <= 0;
     end
 end
 
-jtframe_romrq #(
-    .AW(22),
-    .DW(16),
-    .REPACK(0)  // do not let data from SDRAM pass thru without repacking (latching) it
-                // 0 = data is let pass thru
-                // 1 = data gets repacked (adds one clock of latency)
-) u_romrq(
+jtframe_ram_rq #(.AW(22), .DW(16) ) u_ramrq(
     .rst        ( rst           ),
     .clk        ( clk           ),
-    .clr        ( clr           ), // clears the cache
-    .offset     ( 22'd0         ),
     .addr       ( coded_addr    ),
+    .offset     ( 22'd0         ),
     .addr_ok    ( cs            ),
     .din        ( data_read     ),
     .din_ok     ( rdy           ),
-    .we         ( we            ),
-    .req        ( rd            ),
+    .wrin       ( wrtng         ),
+    .we         ( rqsel         ),
+    .req        ( req           ),
+    .req_rnw    ( req_rnw       ),
     .data_ok    ( dout_ok       ),    // strobe that signals that data is ready
     .sdram_addr ( sdram_addr    ),
+    .wrdata     (               ),
     .dout       ( dout          )
 );
 
