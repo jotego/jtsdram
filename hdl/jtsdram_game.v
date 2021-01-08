@@ -115,6 +115,7 @@ jtsdram_video u_video(
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
     .LHBL       ( LHBL          ),
+    .pxl_cen    ( pxl_cen       ),
     .vdump      ( vdump         ),
     .dwnld_busy ( dwnld_busy    ),
     .ba0_bad    ( ba0_bad       ),
