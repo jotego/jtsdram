@@ -88,7 +88,7 @@ always @(posedge clk, posedge rst) begin
                     dly_cs   <= 1;
                     if( LVBL && !slow ) begin
                         slow_cnt <= 4'hd;
-                     begin
+                     end else begin
                         slow_cnt <= lfsr[3:0];
                     end
                     cnt_addr <= cnt_addr + 1'd1;
