@@ -144,28 +144,8 @@ jtsdram_shuffle u_sh0(
     .ref_in     ( data_ref      ),
     .ref_out    ( ba0_data_ref  )
 );
-/*
-jtsdram_bank u_ch0(
-    .rst        ( rst           ),
-    .clk        ( clk           ),
-    .LVBL       ( LVBL          ),
-    .addr       ( ba0_preaddr   ),
-    .rd         ( ba0_rd        ),
-    .wr         ( ba0_wr        ),
-    .we         ( ba0_we        ),
-    .ack        ( ba0_ack       ),
-    .rdy        ( ba0_rdy       ),
-    .data_ref   ( ba0_data_ref  ),
-    .start      ( rd_start      ),
-    .slow       ( slow          ),
-    .data_read  ( data_read     ),
-    .bad        ( ba0_bad       ),
-    .done       ( ba0_done      )
-);*/
 
-assign ba0_wr = 0;
-
-jtsdram_bank_ro u_ch0(
+jtsdram_bank_rw u_ch0(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
@@ -173,6 +153,8 @@ jtsdram_bank_ro u_ch0(
     .sdram_addr ( ba0_addr      ),
     .coded_addr ( ba0_coded_addr),
     .rd         ( ba0_rd        ),
+    .wr         ( ba0_wr        ),
+    .we         ( ba0_we        ),
     .ack        ( ba0_ack       ),
     .rdy        ( ba0_rdy       ),
     .data_ref   ( ba0_data_ref  ),
