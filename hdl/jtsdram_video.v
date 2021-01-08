@@ -18,6 +18,7 @@
 
 module jtsdram_video(
     input            clk,
+    input            pxl_cen,
     input            LVBL,
     input            LHBL,
     input      [8:0] vdump,
@@ -52,7 +53,7 @@ initial begin
     lfsr = 16'haaaa;
 end
 
-always @(posedge clk) begin
+always @(posedge clk) if(pxl_cen) begin
     if( !LHBL || !LVBL ) begin
         green <= 4'd0;
         red   <= 4'd0;

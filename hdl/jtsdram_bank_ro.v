@@ -64,11 +64,11 @@ always @(posedge clk, posedge rst) begin
         ok_wait <= 0;
         if(start) begin
             cnt_addr <= 22'd0;
-            cs      <= 1;
-            done    <= 0;
-            clr     <= 1;
-            ok_wait <= 1;
-            // bad  <= 0;
+            dly_cs   <= 1;
+            cs       <= 0;
+            done     <= 0;
+            clr      <= 1;
+            ok_wait  <= 1;
         end else if(!done) begin
             if( rd ) clr <= 0;
             if( dly_cs && ( !slow ? LVBL : slow_done) ) begin
@@ -84,12 +84,11 @@ always @(posedge clk, posedge rst) begin
                     $display("Read-only bank verification done");
                     `endif
                 end else begin
+                    cs       <= 0;
+                    dly_cs   <= 1;
                     if( LVBL && !slow ) begin
-                        cs      <= 1;
-                        dly_cs  <= 0;
-                    end else begin
-                        cs       <= 0;
-                        dly_cs   <= 1;
+                        slow_cnt <= 4'hd;
+                     end else begin
                         slow_cnt <= lfsr[3:0];
                     end
                     cnt_addr <= cnt_addr + 1'd1;

@@ -71,12 +71,12 @@ always @(posedge clk, posedge rst) begin
         ok_wait <= 0;
         if(start) begin
             cnt_addr <= 22'd0;
-            cs      <= 1;
-            done    <= 0;
-            clr     <= 1;
-            ok_wait <= 1;
-            wrtng   <= 0;
-            dly_cs  <= 0;
+            dly_cs   <= 1;
+            cs       <= 0;
+            done     <= 0;
+            clr      <= 1;
+            ok_wait  <= 1;
+            wrtng    <= 0;
         end else if(!done) begin
             if( rd ) clr <= 0;
             if( dly_cs && ( !slow || slow_done) ) begin

@@ -51,6 +51,7 @@ module mist_dump(
             //$shm_probe(UUT.u_game,"A");
             //$shm_probe(UUT.u_game.u_snd,"AS");
             // $shm_probe(UUT.u_game.LHBL);
+            //$shm_probe(UUT,"A");
             $shm_probe(UUT.u_game.u_checker,"AS");
             $shm_probe(UUT.u_frame.u_board.u_sdram,"A");
             $shm_probe(UUT.u_frame.u_board.u_sdram.u_core.rfshing);

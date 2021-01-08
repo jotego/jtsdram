@@ -28,7 +28,8 @@ module jtsdram_shuffle(
     output reg [15:0] ref_out
 );
 
-wire [3:0] addr_eff = prog_en ? prog_addr[3:0] : addr_out[3:0];
+reg  [21:0] addr_shf;
+wire [ 3:0] addr_eff = prog_en ? prog_addr[3:0] : addr_shf[3:0];
 
 function [3:0] swap;
     input [3:0] a;
@@ -36,17 +37,21 @@ function [3:0] swap;
 endfunction
 
 always @(*) begin
-    addr_out = addr_in;
+    addr_shf = addr_in;
     if( key[0] )
-        addr_out = { addr_out[11:0], addr_out[12], addr_out[21:13] };
+        addr_shf = { addr_shf[11:0], addr_shf[12], addr_shf[21:13] };
     if( key[1] )
-        addr_out = { addr_out[21:12], swap(addr_out[11:8]), swap(addr_out[7:4]), swap(addr_out[3:0]) };
+        addr_shf = { addr_shf[21:12], swap(addr_shf[11:8]), swap(addr_shf[7:4]), swap(addr_shf[3:0]) };
     if( key[2] )
-        addr_out = { addr_out[20],addr_out[21], swap(addr_out[19:16]), swap(addr_out[15:12]), addr_out[11:0] };
+        addr_shf = { addr_shf[20],addr_shf[21], swap(addr_shf[19:16]), swap(addr_shf[15:12]), addr_shf[11:0] };
     if( key[3])
-        addr_out = addr_out ^ 22'h15_5555;
+        addr_shf = addr_shf ^ 22'h15_5555;
     if( key[4])
-        addr_out = addr_out ^ 22'h2a_aaaa;
+        addr_shf = addr_shf ^ 22'h2a_aaaa;
+end
+
+always @(posedge clk) begin
+    addr_out <= addr_shf;
 end
 
 always @(*) begin

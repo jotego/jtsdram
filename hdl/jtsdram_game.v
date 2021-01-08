@@ -102,6 +102,7 @@ wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
+assign sample = LHBL;
 
 jtsdram_led u_led(
     .clk        ( clk           ),
@@ -115,6 +116,7 @@ jtsdram_video u_video(
     .clk        ( clk           ),
     .LVBL       ( LVBL          ),
     .LHBL       ( LHBL          ),
+    .pxl_cen    ( pxl_cen       ),
     .vdump      ( vdump         ),
     .dwnld_busy ( dwnld_busy    ),
     .ba0_bad    ( ba0_bad       ),
@@ -134,24 +136,37 @@ jtsdram_snd u_snd(
     .snd        ( snd           )
 );
 
-jtframe_cen48 u_cen48(
-    .clk        ( clk           ),
-    .cen16      (               ),
-    .cen12      ( pxl2_cen      ),
-    .cen8       (               ),
-    .cen6       ( pxl_cen       ),
-    .cen4       (               ),
-    .cen4_12    (               ),
-    .cen3       (               ),
-    .cen3q      (               ),
-    .cen1p5     (               ),
-    // 180 shifted signals
-    .cen12b     (               ),
-    .cen6b      (               ),
-    .cen3b      (               ),
-    .cen3qb     (               ),
-    .cen1p5b    (               )
-);
+`ifdef JTFRAME_SDRAM96
+    jtframe_cen96 u_cen96(
+        .clk        ( clk           ),
+        .cen16      (               ),
+        .cen12      ( pxl2_cen      ),
+        .cen8       (               ),
+        .cen6       ( pxl_cen       ),
+        // 180 shifted signals
+        .cen6b      (               )
+    );
+`else
+    jtframe_cen48 u_cen48(
+        .clk        ( clk           ),
+        .cen16      (               ),
+        .cen12      ( pxl2_cen      ),
+        .cen8       (               ),
+        .cen6       ( pxl_cen       ),
+        .cen4       (               ),
+        .cen4_12    (               ),
+        .cen3       (               ),
+        .cen3q      (               ),
+        .cen1p5     (               ),
+        // 180 shifted signals
+        .cen12b     (               ),
+        .cen6b      (               ),
+        .cen3b      (               ),
+        .cen3qb     (               ),
+        .cen1p5b    (               )
+    );
+`endif
+
 
 // Same parameters as Bubble Bobble core
 jtframe_vtimer #(
