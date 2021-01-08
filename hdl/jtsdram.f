@@ -7,4 +7,5 @@ jtsdram_shuffle.v
 jtsdram_snd.v
 jtsdram_video.v
 $JTFRAME/hdl/clocking/jtframe_cen48.v
+$JTFRAME/hdl/clocking/jtframe_cen96.v
 $JTFRAME/hdl/video/jtframe_vtimer.v

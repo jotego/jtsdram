@@ -35,7 +35,7 @@ always @(posedge clk) begin
         pre <= pre>>1;
     else if( LHBL && !last_LHBL ) begin
         if( !bad )
-            pre <= pre + 5'd1;
+            pre <= 5'd0; // no sound while things go well
         else
             pre <= pre + 5'd3;  // goes to a higher pitch when fails
     end

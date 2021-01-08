@@ -134,24 +134,37 @@ jtsdram_snd u_snd(
     .snd        ( snd           )
 );
 
-jtframe_cen48 u_cen48(
-    .clk        ( clk           ),
-    .cen16      (               ),
-    .cen12      ( pxl2_cen      ),
-    .cen8       (               ),
-    .cen6       ( pxl_cen       ),
-    .cen4       (               ),
-    .cen4_12    (               ),
-    .cen3       (               ),
-    .cen3q      (               ),
-    .cen1p5     (               ),
-    // 180 shifted signals
-    .cen12b     (               ),
-    .cen6b      (               ),
-    .cen3b      (               ),
-    .cen3qb     (               ),
-    .cen1p5b    (               )
-);
+`ifdef JTFRAME_SDRAM96
+    jtframe_cen96 u_cen96(
+        .clk        ( clk           ),
+        .cen16      (               ),
+        .cen12      ( pxl2_cen      ),
+        .cen8       (               ),
+        .cen6       ( pxl_cen       ),
+        // 180 shifted signals
+        .cen6b      (               )
+    );
+`else
+    jtframe_cen48 u_cen48(
+        .clk        ( clk           ),
+        .cen16      (               ),
+        .cen12      ( pxl2_cen      ),
+        .cen8       (               ),
+        .cen6       ( pxl_cen       ),
+        .cen4       (               ),
+        .cen4_12    (               ),
+        .cen3       (               ),
+        .cen3q      (               ),
+        .cen1p5     (               ),
+        // 180 shifted signals
+        .cen12b     (               ),
+        .cen6b      (               ),
+        .cen3b      (               ),
+        .cen3qb     (               ),
+        .cen1p5b    (               )
+    );
+`endif
+
 
 // Same parameters as Bubble Bobble core
 jtframe_vtimer #(
