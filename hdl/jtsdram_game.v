@@ -102,6 +102,7 @@ wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
+assign sample = LHBL;
 
 jtsdram_led u_led(
     .clk        ( clk           ),
