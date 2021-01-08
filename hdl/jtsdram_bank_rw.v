@@ -71,7 +71,7 @@ always @(posedge clk, posedge rst) begin
         ok_wait <= 0;
         if(start) begin
             cnt_addr <= 22'd0;
-            cs      <= 1;
+            dly_cs  <= 1;
             done    <= 0;
             clr     <= 1;
             ok_wait <= 1;
