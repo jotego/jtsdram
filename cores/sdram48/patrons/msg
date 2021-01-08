@@ -1,0 +1,21 @@
+  \BSDRAM\W test by \RJotego\W
+  http://patreon.com/topapate
+
+The SDRAM module runs at 48MHz
+
+Only the first 32MB are tested
+
+Red, a blinking LED or a
+sound mean that a failure
+was detected
+
+The screen should cycle from
+bright to dim, indicating that
+the test is advancing
+
+There is no end.
+The longer, the better
+
+Thanks to Sorgelig, Gyurco and
+all the SDRAM builders for their
+support.

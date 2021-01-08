@@ -1,4 +1,4 @@
 <misterromdescription>
 	<name>SDRAM 32MB Parallel test 48MHz</name>
-	<rbf>jtsdram</rbf>
+	<rbf>jtsdram48</rbf>
 </misterromdescription>
