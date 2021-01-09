@@ -34,6 +34,35 @@ it means that the problem only occured in one bank.
 Use the macro **ONEBANK** to simulate only with a single bank. This speeds up
 simulation.
 
+# Phase Invertion
+
+Phase inversion of the SDRAM clock is done in MiSTer by using the altddio_out primitive.
+This method does not seem to be so different from using phase shifting at the PLL.
+
+SDRAM clock path delay examples:
+
+Clock | DDIO/PLL | Min | Max  | Delta
+------|----------|-----|------|-------
+48    |  DDIO    | 6.2 | 11.6 |  5.4
+48    |  PLL     | 6.8 | 12.9 |  6.1
+96    |  DDIO    | 4.2 |  8.5 |  4.3
+
+Clock in MHz, time values in ns.
+
+I don't think instantiating a DDIO cell changes the clock path delay. Quartus seems
+to promote the PLL output to a global clock net anyway, so there is no reason why
+the delay should be different.
+
+On top of the delay, the PLL will add a given precise phase shift, and the DDIO
+will add a fixed 180º shift. In practice, it is not possible to control the phase
+of the SDRAM clock using either method. Feeding back the delay to the PLL is the
+only way of doing it and that seems to require an extra pin of the FPGA. The pin
+must be left unconnected to the PCB as well so it doesn't get loaded.
+
+At the end, it is the synthesis tool that checks that SDRAM I/O constraints are
+met. Sometimes the extra 180º provided by DDIO may provide better STA results,
+on other occasions, it will a given phase shift produced at the PLL.
+
 # Support
 
 The *jotego* nickname had already been used by other people so on some networks
