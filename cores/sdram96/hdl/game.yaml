@@ -1,0 +1,3 @@
+game:
+  - from: sdram48
+    get: [ game.yaml ]
