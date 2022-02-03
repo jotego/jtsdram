@@ -43,36 +43,24 @@ module jtsdram_game(
     // Bank 0: allows R/W
     output   [21:0] ba0_addr,
     output          ba0_rd,
-    output          ba0_wr,
+    output          ba_wr,
     output   [15:0] ba0_din,
     output   [ 1:0] ba0_din_m,  // write mask
     input           ba0_rdy,
-    input           ba0_ack,
-
-    // Bank 1: Read only
+    input    [ 3:0] ba_ack,
+    input    [ 3:0] ba_rdy,
+    input    [ 3:0] ba_dst,
+    input    [ 3:0] ba_dok,
+    output   [ 3:0] ba_rd,
     output   [21:0] ba1_addr,
-    output          ba1_rd,
-    input           ba1_rdy,
-    input           ba1_ack,
-
-    // Bank 2: Read only
     output   [21:0] ba2_addr,
-    output          ba2_rd,
-    input           ba2_rdy,
-    input           ba2_ack,
-
-    // Bank 3: Read only
     output   [21:0] ba3_addr,
-    output          ba3_rd,
-    input           ba3_rdy,
-    input           ba3_ack,
-
-    input   [31:0]  data_read,
+    input    [31:0] data_read,
     output          refresh_en,
 
     // RAM/ROM LOAD
     input   [24:0]  ioctl_addr,
-    input   [ 7:0]  ioctl_data,
+    input   [ 7:0]  ioctl_dout,
     input           ioctl_wr,
     output  [21:0]  prog_addr,
     output  [15:0]  prog_data,
@@ -80,10 +68,13 @@ module jtsdram_game(
     output  [ 1:0]  prog_ba,
     output          prog_we,
     output          prog_rd,
-    input           prog_rdy,
     input           prog_ack,
+    input           prog_dok,
+    input           prog_dst,
+    input           prog_rdy,
     // DIP switches
     input   [31:0]  status,     // only bits 31:16 are looked at
+    input           service,
     input           dip_pause,
     inout           dip_flip,
     input           dip_test,
@@ -214,32 +205,18 @@ jtsdram_checker u_checker(
     .prog_rdy    ( prog_rdy      ),
     .prog_ack    ( prog_ack      ),
 
+    .ba_ack      ( ba_ack        ),
+    .ba_rd       ( ba_rd         ),
+    .ba_rdy      ( ba_rdy        ),
     // Bank 0: allows R/W
-    .ba0_addr    ( ba0_addr      ),
-    .ba0_rd      ( ba0_rd        ),
-    .ba0_wr      ( ba0_wr        ),
-    .ba0_ack     ( ba0_ack       ),
-    .ba0_rdy     ( ba0_rdy       ),
+    .ba0_wr      ( ba_wr         ),
     .ba0_din     ( ba0_din       ),
     .ba0_din_m   ( ba0_din_m     ),
 
-    // Bank 1: Read only
+    .ba0_addr    ( ba0_addr      ),
     .ba1_addr    ( ba1_addr      ),
-    .ba1_rd      ( ba1_rd        ),
-    .ba1_ack     ( ba1_ack       ),
-    .ba1_rdy     ( ba1_rdy       ),
-
-    // Bank 2: Read only
     .ba2_addr    ( ba2_addr      ),
-    .ba2_rd      ( ba2_rd        ),
-    .ba2_ack     ( ba2_ack       ),
-    .ba2_rdy     ( ba2_rdy       ),
-
-    // Bank 3: Read only
     .ba3_addr    ( ba3_addr      ),
-    .ba3_rd      ( ba3_rd        ),
-    .ba3_ack     ( ba3_ack       ),
-    .ba3_rdy     ( ba3_rdy       ),
 
     .data_read   ( data_read     ),
     .refresh_en  ( refresh_en    )

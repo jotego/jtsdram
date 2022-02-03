@@ -113,10 +113,7 @@ end
 
 jtframe_romrq #(
     .AW(22),
-    .DW(16),
-    .REPACK(0)  // do not let data from SDRAM pass thru without repacking (latching) it
-                // 0 = data is let pass thru
-                // 1 = data gets repacked (adds one clock of latency)
+    .DW(16)
 ) u_romrq(
     .rst        ( rst           ),
     .clk        ( clk           ),
