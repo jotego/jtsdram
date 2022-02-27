@@ -14,7 +14,7 @@
 
     Author: Jose Tejada Gomez. Twitter: @topapate
     Version: 1.0
-    Date: 5-1-2021 */
+    Date: 27-2-2022 */
 
 module jtsdram_game(
     input           rst,
@@ -186,7 +186,7 @@ u_timer(
     .VS         ( VS            )
 );
 
-jtsdram_checker u_checker(
+jtldtest_sdram u_checker(
     .rst         ( rst           ),
     .clk         ( clk           ),
     .LVBL        ( LVBL          ),
@@ -210,6 +210,7 @@ jtsdram_checker u_checker(
     .ba_ack      ( ba_ack        ),
     .ba_rd       ( ba_rd         ),
     .ba_rdy      ( ba_rdy        ),
+    .ba_dst      ( ba_dst        ),
     // Bank 0: allows R/W
     .ba0_wr      ( ba_wr         ),
     .ba0_din     ( ba0_din       ),

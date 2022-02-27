@@ -1,0 +1,3 @@
+include ../../sdram48/hdl/jtsdram48.def
+
+JTFRAME_CHEAT
