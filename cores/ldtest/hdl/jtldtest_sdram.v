@@ -64,18 +64,21 @@ module jtldtest_sdram(
 wire       do_dwn, do_check, sdram_ack, sdram_req,
            data_rdy, data_dst, slot_ok;
 wire [1:0] ba_sel;
-reg  [3:0] pre_bad;
+reg  [3:0] pre_bad=0;
 wire [7:0] rd_data;
 reg  [7:0] cmp_data;
+reg [24:0] ioctl_addr_l;
+reg  [1:0] slot_good;
 reg        check_good, rst=1, phase=0, dwn_l=0,
            compare, LVBLl, odd_frame=0;
+wire       addr_chg;
 
 assign do_dwn   = downloading & ~phase;
 assign do_check = downloading &  phase;
 assign ba_sel   = ioctl_addr[23:22];
-assign sdram_ack= ba_ack[ba_sel];
-assign data_dst = ba_dst[ba_sel];
-assign data_rdy = ba_rdy[ba_sel];
+assign sdram_ack= |ba_ack;
+assign data_dst = |ba_dst;
+assign data_rdy = |ba_rdy;
 assign ba0_wr   = 0;
 assign ba0_din  = 0;
 assign ba0_din_m= 3;
@@ -86,27 +89,21 @@ assign bad      = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
 assign dwnld_busy = downloading;
 assign refresh_en = ~downloading;
 assign game_led = phase;
+assign addr_chg = ioctl_addr != ioctl_addr_l;
 
 always @(posedge clk) begin
     rst <= 0;
     dwn_l <= downloading;
+    ioctl_addr_l <= ioctl_addr;
     LVBLl <= LVBL;
     if( !LVBL && LVBLl ) odd_frame <= ~odd_frame;
-    if( do_dwn ) begin
-        compare <= 0;
+    slot_good <= (!downloading || addr_chg || !slot_ok) ? 2'b0 : { slot_good[0], slot_ok };
+    if( ioctl_wr ) cmp_data <= ioctl_dout;
+    if( !phase && ioctl_wr ) begin
         pre_bad <= 0;
     end
-    if( do_check ) begin
-        if( ioctl_wr ) begin
-            compare <= 1;
-            cmp_data <= ioctl_dout;
-        end
-        if( slot_ok && compare ) begin
-            if( cmp_data != rd_data ) begin
-                pre_bad[ba_sel] <= 1;
-            end
-            compare <= 0;
-        end
+    if( phase && slot_good==2 && ioctl_dout != rd_data) begin
+        pre_bad[ba_sel] <= 1;
     end
     if( dwn_l && !downloading ) begin
         phase   <= ~phase;
@@ -147,7 +144,7 @@ jtframe_dwnld #(
 jtframe_rom_1slot #(
     .SLOT0_AW    ( 22           )
 ) u_read(
-    .rst         ( do_dwn       ),
+    .rst         ( ~phase       ),
     .clk         ( clk          ),
 
     .slot0_addr  ( ioctl_addr[21:0] ),
@@ -155,7 +152,7 @@ jtframe_rom_1slot #(
     //  output data
     .slot0_dout  ( rd_data      ),
 
-    .slot0_cs    ( do_check     ),
+    .slot0_cs    ( 1'b1         ),
     .slot0_ok    ( slot_ok      ),
     // SDRAM controller interface
     .sdram_ack   ( sdram_ack    ),

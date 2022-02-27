@@ -106,7 +106,7 @@ jtsdram_video u_video(
     .LHBL       ( LHBL          ),
     .pxl_cen    ( pxl_cen       ),
     .vdump      ( vdump         ),
-    .dwnld_busy ( !game_led     ),
+    .dwnld_busy ( game_led      ),
     .ba0_bad    ( ba0_bad       ),
     .ba1_bad    ( ba1_bad       ),
     .ba2_bad    ( ba2_bad       ),

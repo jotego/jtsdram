@@ -79,7 +79,7 @@ public:
     bool FullDownload() { return full_download; }
     void start( bool download ) {
         full_download = download; // At least the first 32 bytes will always be downloaded
-        if( !full_download && len>32 ) len=32;
+        //if( !full_download && len>32 ) len=32;
         ticks = 0;
         done = false;
         dut.downloading = 1;
@@ -563,10 +563,15 @@ int main(int argc, char *argv[]) {
     UUT game;
     JTSim sim(game, argc, argv);
 
+    int loops=2;
+
     while( !sim.done() ) {
-        sim.clock(5'000);
-        sim.redownload();
-        sim.clock(5'000);
+        sim.clock(9'000);
+        if( sim.game.dwnld_busy==0 ) {
+            sim.redownload();
+            if( loops-- < 0 ) break;
+        }
+        sim.clock(1'000);
     }
     if( sim.get_frame()>1 ) cout << endl;
     return 0;
