@@ -28,10 +28,10 @@ module jtldtest_sdram(
     input           ioctl_wr,
 
     output          bad,
-    output reg      ba0_bad,
-    output reg      ba1_bad,
-    output reg      ba2_bad,
-    output reg      ba3_bad,
+    output          ba0_bad,
+    output          ba1_bad,
+    output          ba2_bad,
+    output          ba3_bad,
 
     output  [21:0]  prog_addr,
     output  [15:0]  prog_data,
@@ -70,8 +70,13 @@ reg  [7:0] cmp_data;
 reg [24:0] ioctl_addr_l;
 reg  [1:0] slot_good;
 reg        check_good, rst=1, phase=0, dwn_l=0,
-           compare, LVBLl, odd_frame=0;
+           compare, LVBLl, odd_frame=0, wrl;
 wire       addr_chg;
+
+assign ba0_bad = pre_bad[0];
+assign ba1_bad = pre_bad[1];
+assign ba2_bad = pre_bad[2];
+assign ba3_bad = pre_bad[3];
 
 assign do_dwn   = downloading & ~phase;
 assign do_check = downloading &  phase;
@@ -86,7 +91,7 @@ assign ba1_addr = ba0_addr;
 assign ba2_addr = ba0_addr;
 assign ba3_addr = ba0_addr;
 assign bad      = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
-assign dwnld_busy = downloading;
+assign dwnld_busy = do_dwn;
 assign refresh_en = ~downloading;
 assign game_led = phase;
 assign addr_chg = ioctl_addr != ioctl_addr_l;
@@ -94,24 +99,21 @@ assign addr_chg = ioctl_addr != ioctl_addr_l;
 always @(posedge clk) begin
     rst <= 0;
     dwn_l <= downloading;
+    wrl <= ioctl_wr;
     LVBLl <= LVBL;
     if( !LVBL && LVBLl ) odd_frame <= ~odd_frame;
     slot_good <= (!downloading || addr_chg || !slot_ok) ? 2'b0 : { slot_good[0], slot_ok };
-    if( ioctl_wr && phase ) begin
+    if( downloading && ioctl_wr && !wrl && phase ) begin
         cmp_data <= ioctl_dout;
         ioctl_addr_l <= ioctl_addr;
-        if( ioctl_addr!=0 && cmp_data != saved )
+        if( ioctl_addr!=0 && cmp_data != saved && slot_ok )
             pre_bad[ba_sel] <= 1;
     end
-    //if( !phase && ioctl_wr ) begin
-    //    pre_bad <= 0;
-    //end
+    if( !phase && ioctl_wr ) begin
+        pre_bad <= 0;
+    end
     if( dwn_l && !downloading ) begin
         phase   <= ~phase;
-        ba0_bad <= pre_bad[0];
-        ba1_bad <= pre_bad[1];
-        ba2_bad <= pre_bad[2];
-        ba3_bad <= pre_bad[3];
     end
 end
 
