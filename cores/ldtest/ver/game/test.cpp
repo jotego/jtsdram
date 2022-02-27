@@ -91,7 +91,7 @@ public:
     void update() {
         dut.ioctl_wr = 0;
         if( !done && dut.downloading ) {
-            switch( ticks&7 ) { // ~ 6 MBytes/s
+            switch( ticks&31 ) {
                 case 0:
                     addr++;
                     dut.ioctl_addr = addr;
@@ -110,6 +110,7 @@ public:
             ticks++;
         } else {
             ticks=0;
+            addr = -1;
         }
     }
 };
@@ -445,17 +446,6 @@ void JTSim::clock(int n) {
     static int ticks=0;
     static int last_dwnd=0;
     while( n-- > 0 ) {
-        sdram.update();
-        dwn.update();
-        int cur_dwn = game.downloading | game.dwnld_busy;
-        if( !cur_dwn && last_dwnd ) {
-            // Download finished
-            if( finish_time>0 ) finish_time += simtime/1000'000'000;
-            if( finish_frame>0 ) finish_frame += frame_cnt;
-            if ( dwn.FullDownload() ) sdram.dump();
-            reset(0);
-        }
-        last_dwnd = cur_dwn;
         game.clk = 1;
 #ifdef JTFRAME_CLK24    // not supported together with JTFRAME_CLK96
         switch( ticks&3 ) {
@@ -470,6 +460,17 @@ void JTSim::clock(int n) {
         game.clk96 = game.clk;
 #endif
         game.eval();
+        sdram.update();
+        dwn.update();
+        int cur_dwn = game.downloading | game.dwnld_busy;
+        if( !cur_dwn && last_dwnd ) {
+            // Download finished
+            if( finish_time>0 ) finish_time += simtime/1000'000'000;
+            if( finish_frame>0 ) finish_frame += frame_cnt;
+            if ( dwn.FullDownload() ) sdram.dump();
+            reset(0);
+        }
+        last_dwnd = cur_dwn;
         simtime += semi_period;
 #ifdef DUMP
         if( tracer && dump_ok ) tracer->dump(simtime);

@@ -147,7 +147,7 @@ jtframe_dwnld #(
 jtframe_rom_1slot #(
     .SLOT0_AW    ( 22           )
 ) u_read(
-    .rst         ( rst          ),
+    .rst         ( do_dwn       ),
     .clk         ( clk          ),
 
     .slot0_addr  ( ioctl_addr[21:0] ),
