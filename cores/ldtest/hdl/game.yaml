@@ -2,6 +2,12 @@ game:
   - from: ldtest
     get:
       - jtldtest_game.v
+      - jtldtest_sdram.v
+  - from: sdram48
+    get:
+      - jtsdram_video.v
+      - jtsdram_snd.v
+      - jtsdram_led.v
 jtframe:
   - from: clocking
     get:
@@ -13,6 +19,7 @@ jtframe:
   - from: sdram
     get:
       - jtframe_romrq.v
+      - jtframe_dwnld.v
   - from: ram
     get:
       - jtframe_ram.v

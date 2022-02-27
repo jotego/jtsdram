@@ -1,0 +1,33 @@
+\BLDTEST\W SDRAM load test by \RJotego\W
+  http://patreon.com/topapate
+
+The SDRAM module runs at 48MHz
+
+Only the first 32MB are tested
+
+Load any file, upto 32MB.
+The tester will store it in the
+SDRAM. Then load it again
+and the tester will compare
+the SDRAM contents with the
+file.
+
+If you load the file
+a third time, the process
+will start over. Each time
+the SDRAM contents are written
+the failure flags are set, so
+the screen goes red. After
+loading the same file a second
+time, the screen should go
+green.
+
+If the LED is off, the core
+is ready to load a new file
+onto the SDRAM. If the LED
+is on, the core will use
+the next load for comparison
+
+A red screen or a
+sound mean that a failure
+was detected

@@ -42,7 +42,6 @@ module jtsdram_game(
 
     // Bank 0: allows R/W
     output   [21:0] ba0_addr,
-    output          ba0_rd,
     output          ba_wr,
     output   [15:0] ba0_din,
     output   [ 1:0] ba0_din_m,  // write mask
@@ -55,7 +54,7 @@ module jtsdram_game(
     output   [21:0] ba1_addr,
     output   [21:0] ba2_addr,
     output   [21:0] ba3_addr,
-    input    [31:0] data_read,
+    input    [15:0] data_read,
     output          refresh_en,
 
     // RAM/ROM LOAD
@@ -85,8 +84,6 @@ module jtsdram_game(
     input           enable_psg,
     input           enable_fm,
     // Debug
-    output   [ 7:0] st_addr,
-    input    [ 7:0] st_dout,
     input    [ 3:0] gfx_en
 );
 
@@ -97,13 +94,11 @@ wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 assign LHBL_dly = LHBL, LVBL_dly=LVBL;
 assign sample = LHBL;
 
-jtsdram_led u_led(
-    .clk        ( clk           ),
-    .rst        ( rst           ),
-    .LVBL       ( LVBL          ),
-    .bad        ( bad           ),
-    .led        ( game_led      )
-);
+wire [3:0] pre_r, pre_g, pre_b;
+
+assign red   = pre_r >> dwnld_busy;
+assign green = pre_g >> dwnld_busy;
+assign blue  = pre_b >> dwnld_busy;
 
 jtsdram_video u_video(
     .clk        ( clk           ),
@@ -111,14 +106,14 @@ jtsdram_video u_video(
     .LHBL       ( LHBL          ),
     .pxl_cen    ( pxl_cen       ),
     .vdump      ( vdump         ),
-    .dwnld_busy ( dwnld_busy    ),
+    .dwnld_busy ( !game_led     ),
     .ba0_bad    ( ba0_bad       ),
     .ba1_bad    ( ba1_bad       ),
     .ba2_bad    ( ba2_bad       ),
     .ba3_bad    ( ba3_bad       ),
-    .red        ( red           ),
-    .green      ( green         ),
-    .blue       ( blue          )
+    .red        ( pre_r         ),
+    .green      ( pre_g         ),
+    .blue       ( pre_b         )
 );
 
 jtsdram_snd u_snd(
@@ -152,6 +147,7 @@ jtsdram_snd u_snd(
         .cen3q      (               ),
         .cen1p5     (               ),
         // 180 shifted signals
+        .cen16b     (               ),
         .cen12b     (               ),
         .cen6b      (               ),
         .cen3b      (               ),
@@ -187,11 +183,16 @@ u_timer(
 );
 
 jtldtest_sdram u_checker(
-    .rst         ( rst           ),
     .clk         ( clk           ),
     .LVBL        ( LVBL          ),
 
+    .downloading ( downloading   ),
     .dwnld_busy  ( dwnld_busy    ),
+    .ioctl_addr  ( ioctl_addr    ),
+    .ioctl_dout  ( ioctl_dout    ),
+    .ioctl_wr    ( ioctl_wr      ),
+    .game_led    ( game_led      ),
+
     .bad         ( bad           ),
     .ba0_bad     ( ba0_bad       ),
     .ba1_bad     ( ba1_bad       ),

@@ -19,9 +19,14 @@
 module jtldtest_sdram(
     input           clk,
     input           LVBL,
+    output          game_led,
 
     input           downloading,
     output          dwnld_busy,
+    input   [24:0]  ioctl_addr,
+    input   [ 7:0]  ioctl_dout,
+    input           ioctl_wr,
+
     output          bad,
     output reg      ba0_bad,
     output reg      ba1_bad,
@@ -50,18 +55,20 @@ module jtldtest_sdram(
     output   [21:0] ba2_addr,
     output   [21:0] ba3_addr,
 
-    input   [31:0]  data_read,
-    output          refresh_en,
-
-    input   [ 7:0]  st_addr,
-    output  [ 7:0]  st_dout
+    input   [15:0]  data_read,
+    output          refresh_en
+//    input   [ 7:0]  st_addr,
+//    output  [ 7:0]  st_dout
 );
 
 wire       do_dwn, do_check, sdram_ack, sdram_req,
            data_rdy, data_dst, slot_ok;
 wire [1:0] ba_sel;
+reg  [3:0] pre_bad;
 wire [7:0] rd_data;
-reg        check_good, rst=1, phase=0, dwn_l=0;
+reg  [7:0] cmp_data;
+reg        check_good, rst=1, phase=0, dwn_l=0,
+           compare, LVBLl, odd_frame=0;
 
 assign do_dwn   = downloading & ~phase;
 assign do_check = downloading &  phase;
@@ -70,37 +77,43 @@ assign sdram_ack= ba_ack[ba_sel];
 assign data_dst = ba_dst[ba_sel];
 assign data_rdy = ba_rdy[ba_sel];
 assign ba0_wr   = 0;
+assign ba0_din  = 0;
+assign ba0_din_m= 3;
 assign ba1_addr = ba0_addr;
 assign ba2_addr = ba0_addr;
 assign ba3_addr = ba0_addr;
 assign bad      = ba0_bad | ba1_bad | ba2_bad | ba3_bad;
+assign dwnld_busy = downloading;
+assign refresh_en = ~downloading;
+assign game_led = phase;
 
 always @(posedge clk) begin
     rst <= 0;
     dwn_l <= downloading;
-    if( downloading && !dwn_l ) begin
-        phase <= ~phase;
-    end
+    LVBLl <= LVBL;
+    if( !LVBL && LVBLl ) odd_frame <= ~odd_frame;
     if( do_dwn ) begin
-        ba0_bad <= 0;
-        ba1_bad <= 0;
-        ba2_bad <= 0;
-        ba3_bad <= 0;
         compare <= 0;
+        pre_bad <= 0;
     end
     if( do_check ) begin
-        if( ioctl_wr ) compare <= 1;
-        if( slot_good && compare ) begin
-            if( ioctl_dout != rd_data ) begin
-                case( ba_sel )
-                    0: ba0_bad <= 1;
-                    1: ba1_bad <= 1;
-                    2: ba2_bad <= 1;
-                    3: ba3_bad <= 1;
-                endcase
+        if( ioctl_wr ) begin
+            compare <= 1;
+            cmp_data <= ioctl_dout;
+        end
+        if( slot_ok && compare ) begin
+            if( cmp_data != rd_data ) begin
+                pre_bad[ba_sel] <= 1;
             end
             compare <= 0;
         end
+    end
+    if( dwn_l && !downloading ) begin
+        phase   <= ~phase;
+        ba0_bad <= pre_bad[0];
+        ba1_bad <= pre_bad[1];
+        ba2_bad <= pre_bad[2];
+        ba3_bad <= pre_bad[3];
     end
 end
 
@@ -112,10 +125,11 @@ end
 jtframe_dwnld #(
     .BA1_START   ( 25'h080_0000 ),
     .BA2_START   ( 25'h100_0000 ),
-    .BA3_START   ( 25'h180_0000 )
+    .BA3_START   ( 25'h180_0000 ),
+    .SWAB        ( 1            )
 ) u_dwnld(
     .clk         ( clk          ),
-    .downloading ( downloading  ),
+    .downloading ( do_dwn       ),
     .ioctl_addr  ( ioctl_addr   ),
     .ioctl_dout  ( ioctl_dout   ),
     .ioctl_wr    ( ioctl_wr     ),
