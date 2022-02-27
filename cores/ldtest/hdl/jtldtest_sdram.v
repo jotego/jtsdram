@@ -61,7 +61,7 @@ module jtldtest_sdram(
 //    output  [ 7:0]  st_dout
 );
 
-wire       do_dwn, do_check, sdram_ack, sdram_req,
+wire       do_dwn, sdram_ack, sdram_req,
            data_rdy, data_dst, slot_ok;
 wire [1:0] ba_sel;
 reg  [3:0] pre_bad=0;
@@ -69,7 +69,7 @@ wire [7:0] saved;
 reg  [7:0] cmp_data;
 reg [24:0] ioctl_addr_l;
 reg  [1:0] slot_good;
-reg        check_good, rst=1, phase=0, dwn_l=0,
+reg        check_good, phase=0, dwn_l=0,
            compare, LVBLl, odd_frame=0, wrl;
 wire       addr_chg;
 
@@ -79,7 +79,6 @@ assign ba2_bad = pre_bad[2];
 assign ba3_bad = pre_bad[3];
 
 assign do_dwn   = downloading & ~phase;
-assign do_check = downloading &  phase;
 assign ba_sel   = ioctl_addr[24:23];
 assign sdram_ack= |ba_ack;
 assign data_dst = |ba_dst;
@@ -97,7 +96,6 @@ assign game_led = phase;
 assign addr_chg = ioctl_addr != ioctl_addr_l;
 
 always @(posedge clk) begin
-    rst <= 0;
     dwn_l <= downloading;
     wrl <= ioctl_wr;
     LVBLl <= LVBL;
