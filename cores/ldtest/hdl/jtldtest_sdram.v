@@ -65,7 +65,7 @@ wire       do_dwn, do_check, sdram_ack, sdram_req,
            data_rdy, data_dst, slot_ok;
 wire [1:0] ba_sel;
 reg  [3:0] pre_bad=0;
-wire [7:0] rd_data;
+wire [7:0] saved;
 reg  [7:0] cmp_data;
 reg [24:0] ioctl_addr_l;
 reg  [1:0] slot_good;
@@ -94,17 +94,18 @@ assign addr_chg = ioctl_addr != ioctl_addr_l;
 always @(posedge clk) begin
     rst <= 0;
     dwn_l <= downloading;
-    ioctl_addr_l <= ioctl_addr;
     LVBLl <= LVBL;
     if( !LVBL && LVBLl ) odd_frame <= ~odd_frame;
     slot_good <= (!downloading || addr_chg || !slot_ok) ? 2'b0 : { slot_good[0], slot_ok };
-    if( ioctl_wr ) cmp_data <= ioctl_dout;
-    if( !phase && ioctl_wr ) begin
-        pre_bad <= 0;
+    if( ioctl_wr && phase ) begin
+        cmp_data <= ioctl_dout;
+        ioctl_addr_l <= ioctl_addr;
+        if( ioctl_addr!=0 && cmp_data != saved )
+            pre_bad[ba_sel] <= 1;
     end
-    if( phase && slot_good==2 && ioctl_dout != rd_data) begin
-        pre_bad[ba_sel] <= 1;
-    end
+    //if( !phase && ioctl_wr ) begin
+    //    pre_bad <= 0;
+    //end
     if( dwn_l && !downloading ) begin
         phase   <= ~phase;
         ba0_bad <= pre_bad[0];
@@ -147,10 +148,10 @@ jtframe_rom_1slot #(
     .rst         ( ~phase       ),
     .clk         ( clk          ),
 
-    .slot0_addr  ( ioctl_addr[21:0] ),
+    .slot0_addr  ( ioctl_addr_l[21:0] ),
 
     //  output data
-    .slot0_dout  ( rd_data      ),
+    .slot0_dout  ( saved        ),
 
     .slot0_cs    ( 1'b1         ),
     .slot0_ok    ( slot_ok      ),

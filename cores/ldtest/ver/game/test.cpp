@@ -563,7 +563,7 @@ int main(int argc, char *argv[]) {
     UUT game;
     JTSim sim(game, argc, argv);
 
-    int loops=2;
+    int loops=1;
 
     while( !sim.done() ) {
         sim.clock(9'000);
