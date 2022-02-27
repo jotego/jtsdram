@@ -80,7 +80,7 @@ assign ba3_bad = pre_bad[3];
 
 assign do_dwn   = downloading & ~phase;
 assign do_check = downloading &  phase;
-assign ba_sel   = ioctl_addr[23:22];
+assign ba_sel   = ioctl_addr[24:23];
 assign sdram_ack= |ba_ack;
 assign data_dst = |ba_dst;
 assign data_rdy = |ba_rdy;
@@ -119,7 +119,7 @@ end
 
 always @* begin
     ba_rd = 0;
-    ba_rd[ba_sel] = sdram_req;
+    ba_rd[ ioctl_addr_l[24:23] ] = sdram_req;
 end
 
 jtframe_dwnld #(
@@ -145,12 +145,12 @@ jtframe_dwnld #(
 );
 
 jtframe_rom_1slot #(
-    .SLOT0_AW    ( 22           )
+    .SLOT0_AW    ( 23           )
 ) u_read(
     .rst         ( ~phase       ),
     .clk         ( clk          ),
 
-    .slot0_addr  ( ioctl_addr_l[21:0] ),
+    .slot0_addr  ( ioctl_addr_l[22:0] ),
 
     //  output data
     .slot0_dout  ( saved        ),
