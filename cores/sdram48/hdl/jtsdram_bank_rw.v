@@ -32,7 +32,7 @@ module jtsdram_bank_rw(
     input      [15:0] data_ref,
     input             start,
     input             slow,
-    input      [31:0] data_read,
+    input      [15:0] data_read,
     output reg        bad,
     output reg        done
 );

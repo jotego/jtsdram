@@ -25,8 +25,8 @@ module jtsdram_game(
     output   [3:0]  red,
     output   [3:0]  green,
     output   [3:0]  blue,
-    output          LHBL_dly,
-    output          LVBL_dly,
+    output          LHBL,
+    output          LVBL,
     output          HS,
     output          VS,
     // LED
@@ -55,7 +55,7 @@ module jtsdram_game(
     output   [21:0] ba1_addr,
     output   [21:0] ba2_addr,
     output   [21:0] ba3_addr,
-    input    [31:0] data_read,
+    input    [15:0] data_read,
     output          refresh_en,
 
     // RAM/ROM LOAD
@@ -73,7 +73,8 @@ module jtsdram_game(
     input           prog_dst,
     input           prog_rdy,
     // DIP switches
-    input   [31:0]  status,     // only bits 31:16 are looked at
+    input   [31:0]  status,
+    input   [31:0]  dipsw,
     input           service,
     input           dip_pause,
     inout           dip_flip,
@@ -90,11 +91,10 @@ module jtsdram_game(
     input    [ 3:0] gfx_en
 );
 
-wire LHBL, LVBL, bad;
+wire       bad;
 wire [8:0] vdump;
 wire       ba0_bad, ba1_bad, ba2_bad, ba3_bad;
 
-assign LHBL_dly = LHBL, LVBL_dly=LVBL;
 assign sample = LHBL;
 
 jtsdram_led u_led(

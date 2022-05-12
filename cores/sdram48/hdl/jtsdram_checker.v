@@ -49,7 +49,7 @@ module jtsdram_checker(
     output   [21:0] ba2_addr,
     output   [21:0] ba3_addr,
 
-    input   [31:0]  data_read,
+    input    [15:0] data_read,
     output          refresh_en
 );
 
